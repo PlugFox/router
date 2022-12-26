@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "dev",
+      "program": "example/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "env": {
+        "ENVIRONMENT": "develop"
+      },
+      "args": [
+        "--dart-define=ENVIRONMENT=develop"
+      ]
+    }
+  ]
+}
