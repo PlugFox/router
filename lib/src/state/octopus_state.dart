@@ -9,17 +9,21 @@ import 'octopus_node.dart';
 /// Router whole application state
 /// {@endtemplate}
 @immutable
-abstract class OctopusState implements Iterable<OctopusNode> {
+abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   /// Current active/visible node
-  OctopusNode get current;
+  OctopusNode<OctopusRoute> get current;
 
   /// Active routing path of the application
   /// e.g. /shop/category@id=1/category@id=24/brand&name=Apple/product@id=123&color=green
-  List<OctopusNode> get location;
+  List<OctopusNode<OctopusRoute>> get location;
+
+  /// Returns the element at the given [index] in the list
+  ///  or throws an [RangeError]
+  OctopusNode<OctopusRoute> operator [](int index);
 
   OctopusState copyWith({
-    OctopusNode? newCurrent,
-    List<OctopusNode>? newNodes,
+    OctopusNode<OctopusRoute>? newCurrent,
+    List<OctopusNode<OctopusRoute>>? newNodes,
   });
 
   Map<String, Object?> toJson();
@@ -44,6 +48,7 @@ abstract class OctopusState implements Iterable<OctopusNode> {
 
 @internal
 class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
+    with _OctopusNodeImmutableListMixin
     implements OctopusState {
   OctopusStateImpl({
     required OctopusNode<OctopusRoute> current,
@@ -59,10 +64,8 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
   @override
   List<OctopusNode<OctopusRoute>> get location => _location;
   final List<OctopusNode<OctopusRoute>> _location;
-  final List<OctopusNode<OctopusRoute>> _nodes;
-
   @override
-  Iterator<OctopusNode<OctopusRoute>> get iterator => _nodes.iterator;
+  final List<OctopusNode<OctopusRoute>> _nodes;
 
   @override
   OctopusState copyWith({
@@ -76,4 +79,21 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
 
   @override
   String toString() => throw UnimplementedError();
+}
+
+mixin _OctopusNodeImmutableListMixin on IterableBase<OctopusNode<OctopusRoute>>
+    implements OctopusState {
+  abstract final List<OctopusNode<OctopusRoute>> _nodes;
+
+  @override
+  int get length => _nodes.length;
+
+  @override
+  OctopusNode<OctopusRoute> get last => _nodes.last;
+
+  @override
+  Iterator<OctopusNode<OctopusRoute>> get iterator => _nodes.iterator;
+
+  @override
+  OctopusNode<OctopusRoute> operator [](int index) => _nodes.elementAt(index);
 }

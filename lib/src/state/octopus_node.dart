@@ -16,15 +16,16 @@ abstract class OctopusNode<T extends OctopusRoute> {
     Map<String, String> arguments,
   }) = OctopusNode$IndexedStack;
 
-  /* factory OctopusNode.switch({
+  const factory OctopusNode.navigator({
     required String name,
     Map<String, String> arguments,
   }) = OctopusNode$Page;
 
-  factory OctopusNode.navigator({
+  /* factory OctopusNode.switch({
     required String name,
     Map<String, String> arguments,
-  }) = OctopusNode$Page; */
+  }) = OctopusNode$Page;
+*/
 
   /* const factory OctopusNode({
     required String name,
@@ -91,11 +92,30 @@ class OctopusNode$IndexedStack<T extends OctopusRoute>
   final List<OctopusNode> children;
 }
 
-/*
-class OctopusNode$Navigator {
+@immutable
+class OctopusNode$Navigator<T extends OctopusRoute> implements OctopusNode<T> {
+  const OctopusNode$Navigator({
+    required this.name,
+    required this.current,
+    required this.children,
+    this.arguments = const <String, String>{},
+  }); /* : assert(name.isNotEmpty, 'Name must not be empty'),
+        assert(children.contains(current), 'Current child not in children'),
+        assert(children.isNotEmpty, 'Children must not be empty'); */
 
+  @override
+  final String name;
+
+  @override
+  final Map<String, String> arguments;
+
+  final OctopusNode current;
+
+  @override
+  final List<OctopusNode> children;
 }
 
+/*
 class OctopusNode$Switch {
 
 }
