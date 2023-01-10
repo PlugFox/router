@@ -21,6 +21,8 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   ///  or throws an [RangeError]
   OctopusNode<OctopusRoute> operator [](int index);
 
+  OctopusState? maybePop();
+
   OctopusState copyWith({
     OctopusNode<OctopusRoute>? newCurrent,
     List<OctopusNode<OctopusRoute>>? newNodes,
@@ -66,6 +68,9 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
   final List<OctopusNode<OctopusRoute>> _location;
   @override
   final List<OctopusNode<OctopusRoute>> _nodes;
+
+  @override
+  OctopusState? maybePop() => throw UnimplementedError();
 
   @override
   OctopusState copyWith({
