@@ -5,19 +5,19 @@ import '../route/octopus_route.dart';
 @immutable
 abstract class OctopusNode<T extends OctopusRoute> {
   const factory OctopusNode.page({
-    required String name,
+    required T route,
     Map<String, String> arguments,
   }) = OctopusNode$Page;
 
   const factory OctopusNode.indexedStack({
-    required String name,
+    required T route,
     required OctopusNode current,
     required List<OctopusNode> children,
     Map<String, String> arguments,
   }) = OctopusNode$IndexedStack;
 
   const factory OctopusNode.navigator({
-    required String name,
+    required T route,
     Map<String, String> arguments,
   }) = OctopusNode$Page;
 
@@ -41,7 +41,7 @@ abstract class OctopusNode<T extends OctopusRoute> {
     Map<String, Object?> json,
   ) = OctopusNodeImpl.fromJson; */
 
-  abstract final String name;
+  abstract final T route;
   abstract final Map<String, String> arguments;
   abstract final List<OctopusNode> children;
 
@@ -54,12 +54,12 @@ abstract class OctopusNode<T extends OctopusRoute> {
 @immutable
 class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
   const OctopusNode$Page({
-    required this.name,
+    required this.route,
     this.arguments = const <String, String>{},
   }); /* : assert(name.isNotEmpty, 'Name must not be empty'); */
 
   @override
-  final String name;
+  final T route;
 
   @override
   final Map<String, String> arguments;
@@ -72,7 +72,7 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
 class OctopusNode$IndexedStack<T extends OctopusRoute>
     implements OctopusNode<T> {
   const OctopusNode$IndexedStack({
-    required this.name,
+    required this.route,
     required this.current,
     required this.children,
     this.arguments = const <String, String>{},
@@ -81,7 +81,7 @@ class OctopusNode$IndexedStack<T extends OctopusRoute>
         assert(children.isNotEmpty, 'Children must not be empty'); */
 
   @override
-  final String name;
+  final T route;
 
   @override
   final Map<String, String> arguments;
@@ -95,7 +95,7 @@ class OctopusNode$IndexedStack<T extends OctopusRoute>
 @immutable
 class OctopusNode$Navigator<T extends OctopusRoute> implements OctopusNode<T> {
   const OctopusNode$Navigator({
-    required this.name,
+    required this.route,
     required this.current,
     required this.children,
     this.arguments = const <String, String>{},
@@ -104,7 +104,7 @@ class OctopusNode$Navigator<T extends OctopusRoute> implements OctopusNode<T> {
         assert(children.isNotEmpty, 'Children must not be empty'); */
 
   @override
-  final String name;
+  final T route;
 
   @override
   final Map<String, String> arguments;
