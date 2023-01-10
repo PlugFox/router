@@ -11,7 +11,7 @@ import 'octopus_node.dart';
 @immutable
 abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   /// Current active/visible node
-  OctopusNode<OctopusRoute> get current;
+  abstract final OctopusNode<OctopusRoute> current;
 
   /// Active routing path of the application
   /// e.g. /shop/category@id=1/category@id=24/brand&name=Apple/product@id=123&color=green

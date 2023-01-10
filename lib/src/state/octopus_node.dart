@@ -47,8 +47,8 @@ abstract class OctopusNode<T extends OctopusRoute> {
 
   // Map<String, Object?> toJson();
 
-  // @override
-  // String toString() => 'name@arguments';
+  @override
+  String toString();
 }
 
 @immutable

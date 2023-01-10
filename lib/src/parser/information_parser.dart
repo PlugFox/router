@@ -20,7 +20,8 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
 
   @override
   Future<OctopusState> parseRouteInformation(
-      RouteInformation routeInformation) {
+    RouteInformation routeInformation,
+  ) {
     final location = Uri.tryParse(routeInformation.location ?? '/');
     final state = routeInformation.state ?? <String, Object?>{};
     if (location is! Uri) {
@@ -39,10 +40,33 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   //    SynchronousFuture<OctopusState>();
 
   @override
-  RouteInformation restoreRouteInformation(OctopusState configuration) {
-    final path = configuration.location;
-    final state = configuration.toJson();
-    throw UnimplementedError();
+  RouteInformation restoreRouteInformation(
+    OctopusState configuration,
+  ) =>
+      RouteInformation(
+        location: _locationFromConfiguration(configuration),
+        state: configuration.toJson(),
+      );
+
+  static String _locationFromConfiguration(OctopusState configuration) {
+    bool isFirst = true;
+    final StringBuffer buffer = StringBuffer();
+    void separate() => isFirst ? isFirst = false : buffer.write('/');
+    final nodes = configuration.location;
+    for (final node in nodes) {
+      separate();
+      buffer.write(node.route.name);
+      if (node.arguments.isEmpty) continue;
+      buffer.write('@');
+      final entries = node.arguments.entries.toList()
+        ..sort((a, b) => a.key.compareTo(b.key));
+      for (final entry in entries) {
+        buffer
+          ..write(entry.key)
+          ..write('=')
+          ..write(entry.value);
+      }
+    }
+    return buffer.toString();
   }
-  //    RouteInformation(location: '/', state: <String, Object?>{});
 }
