@@ -10,6 +10,22 @@ import 'octopus_node.dart';
 /// {@endtemplate}
 @immutable
 abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
+  /// {@macro octopus_state}
+  factory OctopusState({
+    required OctopusNode<OctopusRoute> current,
+    required Iterable<OctopusNode<OctopusRoute>> nodes,
+  }) =>
+      OctopusStateImpl(
+        current: current,
+        nodes: nodes,
+      );
+
+  /// {@macro octopus_state}
+  factory OctopusState.single(OctopusNode<OctopusRoute> node) => OctopusState(
+        current: node,
+        nodes: <OctopusNode<OctopusRoute>>[node],
+      );
+
   /// Current active/visible node
   abstract final OctopusNode<OctopusRoute> current;
 
@@ -80,7 +96,10 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
       throw UnimplementedError();
 
   @override
-  Map<String, Object?> toJson() => throw UnimplementedError();
+  Map<String, Object?> toJson() => <String, Object?>{
+        'current': current.toJson(),
+        'nodes': map<Map<String, Object?>>((e) => e.toJson()).toList(),
+      };
 
   @override
   String toString() => throw UnimplementedError();

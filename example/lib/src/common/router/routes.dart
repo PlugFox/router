@@ -11,15 +11,18 @@ abstract class Routes {
   static const OctopusRoute product = ProductRoute();
 
   /// All routes in the app.
-  static const List<OctopusRoute> values = <OctopusRoute>[
+  static const Set<OctopusRoute> values = <OctopusRoute>{
     shop,
     category,
     product,
-  ];
+  };
 }
 
 class ShopRoute extends OctopusRoute$Page {
   const ShopRoute() : super('Shop');
+
+  @override
+  bool get isHome => true;
 
   @override
   Page<void> call(BuildContext context, Map<String, String> arguments) =>

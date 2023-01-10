@@ -4,6 +4,11 @@ import 'package:flutter/widgets.dart';
 abstract class OctopusRoute {
   const OctopusRoute._(this.name);
   final String name;
+
+  bool get isHome => false;
+
+  // TODO: visitor pattern
+  // Matiunin Mikhail <plugfox@gmail.com>, 11 January 2023
 }
 
 abstract class OctopusRoute$Page extends OctopusRoute {
@@ -12,14 +17,14 @@ abstract class OctopusRoute$Page extends OctopusRoute {
   Page<void> call(BuildContext context, Map<String, String> arguments);
 }
 
-abstract class OctopusRoute$IndexedStack extends OctopusRoute {
-  const OctopusRoute$IndexedStack(String name) : super._(name);
+/* abstract class OctopusRoute$Tabs extends OctopusRoute {
+  const OctopusRoute$Tabs(String name) : super._(name);
 
-  /* Page<void> call(BuildContext context, Map<String, String> arguments); */
-}
+  Page<void> call(BuildContext context, Map<String, String> arguments);
+} */
 
-abstract class OctopusRoute$Navigator extends OctopusRoute {
+/* abstract class OctopusRoute$Navigator extends OctopusRoute {
   const OctopusRoute$Navigator(String name) : super._(name);
 
   /* Page<void> call(BuildContext context, Map<String, String> arguments); */
-}
+} */

@@ -11,7 +11,7 @@ import 'octopus_delegate.dart';
 /// The main class of the package.
 /// {@endtemplate}
 abstract class Octopus {
-  factory Octopus({required List<OctopusRoute> routes}) = OctopusImpl;
+  factory Octopus({required Set<OctopusRoute> routes}) = OctopusImpl;
   abstract final RouterConfig<OctopusState> config;
 }
 
@@ -19,9 +19,22 @@ abstract class Octopus {
 @sealed
 @internal
 class OctopusImpl implements Octopus {
-  factory OctopusImpl({required List<OctopusRoute> routes}) {
+  factory OctopusImpl({required Set<OctopusRoute> routes}) {
+    if (routes.isEmpty) throw StateError('Routes must not be empty');
+    final OctopusRoute home;
+    try {
+      home = routes.singleWhere((route) => route.isHome);
+    } on StateError catch (error, stackTrace) {
+      Error.throwWithStackTrace(
+        StateError('Routes should contain one default home route'),
+        stackTrace,
+      );
+    }
     final routeInformationProvider = OctopusInformationProvider();
-    final routeInformationParser = OctopusInformationParser();
+    final routeInformationParser = OctopusInformationParser(
+      home: home,
+      routes: routes,
+    );
     final routerDelegate = OctopusDelegate();
     final backButtonDispatcher = RootBackButtonDispatcher();
     return OctopusImpl._(
