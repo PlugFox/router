@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import '../state/octopus_state.dart';
 import '../widget/inherited_octopus.dart';
 
+/// Octopus delegate.
 class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   OctopusState? _currentConfiguration;
 
@@ -14,16 +15,19 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
     return state;
   }
 
+  /// WidgetApp's navigator.
   NavigatorState? get navigator => _modalObserver.navigator;
   final NavigatorObserver _modalObserver = RouteObserver<ModalRoute<Object?>>();
 
   @override
   Future<void> setNewRoutePath(covariant OctopusState configuration) {
     // If unchanged, do nothing
-    //if (_currentConfiguration == configuration) return SynchronousFuture<void>(null);
+    //if (_currentConfiguration == configuration) {
+    //  return SynchronousFuture<void>(null);
+    //}
 
     // ignore: todo
-    // TODO: check if the new configuration is valid
+    // TODO(plugfox): check if the new configuration is valid
     // exclude duplicates
     // Matiunin Mikhail <plugfox@gmail.com>, 06 December 2022
     _currentConfiguration = configuration;
@@ -48,17 +52,16 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
           reportsRouteUpdateToEngine: true,
           observers: <NavigatorObserver>[
             _modalObserver,
-            // TODO: Additional observers from the [Octopus] class
-            // Matiunin Mikhail <plugfox@gmail.com>, 10 January 2023
+            // TODO(plugfox): Additional observers from the [Octopus] class
+            // also add RouterAware
           ],
           pages: const <Page<Object?>>[
-            // TODO: Pages from the current [OctopusState]
-            // Matiunin Mikhail <plugfox@gmail.com>, 10 January 2023
+            // TODO(plugfox): Pages from the current [OctopusState]
           ],
           onPopPage: _onPopPage,
-          // TODO: restorationScopeId: restorationScopeId,
-          // TODO: transitionDelegate: throw UnimplementedError(),
-          // TODO: onUnknownRoute: _onUnknownRoute,
+          // TODO(plugfox): restorationScopeId: restorationScopeId,
+          // TODO(plugfox): transitionDelegate: throw UnimplementedError(),
+          // TODO(plugfox): onUnknownRoute: _onUnknownRoute,
         ),
       );
 

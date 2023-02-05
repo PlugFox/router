@@ -37,13 +37,16 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   ///  or throws an [RangeError]
   OctopusNode<OctopusRoute> operator [](int index);
 
+  /// Try to pop the current node and return new, previus state
   OctopusState? maybePop();
 
+  /// Copy this state with new values
   OctopusState copyWith({
     OctopusNode<OctopusRoute>? newCurrent,
     List<OctopusNode<OctopusRoute>>? newNodes,
   });
 
+  /// Convert this state to JSON.
   Map<String, Object?> toJson();
 
   /// e.g.:
@@ -64,10 +67,12 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   String toString();
 }
 
+/// {@nodoc}
 @internal
 class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
     with _OctopusNodeImmutableListMixin
     implements OctopusState {
+  /// {@nodoc}
   OctopusStateImpl({
     required OctopusNode<OctopusRoute> current,
     required Iterable<OctopusNode<OctopusRoute>> nodes,

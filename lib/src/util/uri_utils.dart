@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 
+/// {@nodoc}
 @sealed
 @internal
 abstract class UriUtils {

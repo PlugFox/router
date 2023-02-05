@@ -11,7 +11,10 @@ import 'octopus_delegate.dart';
 /// The main class of the package.
 /// {@endtemplate}
 abstract class Octopus {
+  /// {@macro octopus}
   factory Octopus({required Set<OctopusRoute> routes}) = OctopusImpl;
+
+  /// A convenient bundle to configure a [Router] widget.
   abstract final RouterConfig<OctopusState> config;
 }
 
@@ -19,6 +22,7 @@ abstract class Octopus {
 @sealed
 @internal
 class OctopusImpl implements Octopus {
+  /// {@nodoc}
   factory OctopusImpl({required Set<OctopusRoute> routes}) {
     if (routes.isEmpty) throw StateError('Routes must not be empty');
     final OctopusRoute home;

@@ -29,7 +29,7 @@ analyzer:
   # Set the following options to true to enable additional analysis.
   errors:
     # Info
-    todo: info
+    TODO: info
     directives_ordering: info
     always_declare_return_types: info
 

@@ -11,6 +11,7 @@ import '../../octopus.dart';
 /// {@nodoc}
 @internal
 class OctopusInformationParser implements RouteInformationParser<OctopusState> {
+  /// {@nodoc}
   OctopusInformationParser(
       {required OctopusRoute home, required Set<OctopusRoute> routes})
       : _home = OctopusState.single(_nodeFromRoute(route: home)!),
@@ -45,10 +46,9 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
       return SynchronousFuture<OctopusState>(_home);
     }
     final location = _nodesFromUri(uri, _routes);
-    // TODO: create OctopusState from location and state
+    // TODO(plugfox): create OctopusState from location and state
     // contain graph tree of OctopusNode and active list of OctopusNode
     // active graph tree is changed by active list
-    // Matiunin Mikhail <plugfox@gmail.com>, 07 January 2023
     return SynchronousFuture<OctopusState>(
       OctopusState(current: location.last, nodes: location),
     );
@@ -136,8 +136,7 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
     return nodes.reversed.toList();
   }
 
-  // TODO: add another types of OctopusNode
-  // Matiunin Mikhail <plugfox@gmail.com>, 11 January 2023
+  // TODO(plugfox): add another types of OctopusNode
   static OctopusNode? _nodeFromRoute({
     required OctopusRoute route,
     Map<String, String> arguments = const <String, String>{},

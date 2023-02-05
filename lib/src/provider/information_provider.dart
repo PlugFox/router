@@ -6,7 +6,8 @@ import 'package:meta/meta.dart';
 /// The route information provider that propagates
 /// the platform route information changes.
 ///
-/// This provider also reports the new route information from the [Router] widget
+/// This provider also reports the new route
+/// information from the [Router] widget
 /// back to engine using message channel method, the
 /// [SystemNavigator.routeInformationUpdated].
 ///
@@ -18,6 +19,7 @@ import 'package:meta/meta.dart';
 @internal
 class OctopusInformationProvider extends RouteInformationProvider
     with WidgetsBindingObserver, ChangeNotifier {
+  /// {@nodoc}
   OctopusInformationProvider({
     String? initialLocation,
     Map<String, Object?>? initialState,

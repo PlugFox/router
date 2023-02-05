@@ -2,8 +2,10 @@ import 'package:meta/meta.dart';
 
 import '../route/octopus_route.dart';
 
+/// Base class for all nodes.
 @immutable
 abstract class OctopusNode<T extends OctopusRoute> {
+  /// Page node.
   const factory OctopusNode.page({
     required T route,
     Map<String, String> arguments,
@@ -26,12 +28,19 @@ abstract class OctopusNode<T extends OctopusRoute> {
     Map<String, String> arguments,
   }) = OctopusNode$Page; */
 
+  /// Route of this node.
   abstract final T route;
+
+  /// Arguments of this node.
   abstract final Map<String, String> arguments;
+
+  /// Children of this node.
   abstract final List<OctopusNode> children;
 
+  /// Convert this node to JSON.
   Map<String, Object?> toJson();
 
+  /// Pattern matching.
   R map<R>({
     required R Function(OctopusNode$Page node) page,
   });
@@ -40,8 +49,10 @@ abstract class OctopusNode<T extends OctopusRoute> {
   String toString();
 }
 
+/// Page node.
 @immutable
 class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
+  /// Page node.
   const OctopusNode$Page({
     required this.route,
     this.arguments = const <String, String>{},
