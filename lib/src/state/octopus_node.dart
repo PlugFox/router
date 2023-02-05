@@ -1,10 +1,12 @@
+import 'dart:collection';
+
 import 'package:meta/meta.dart';
 
 import '../route/octopus_route.dart';
 
 /// Base class for all nodes.
 @immutable
-abstract class OctopusNode<T extends OctopusRoute> {
+sealed class OctopusNode<T extends OctopusRoute> {
   /// Page node.
   const factory OctopusNode.page({
     required T route,
@@ -45,6 +47,9 @@ abstract class OctopusNode<T extends OctopusRoute> {
     required R Function(OctopusNode$Page node) page,
   });
 
+  /// Walks the children of this node.
+  void visitChildNodes(NodeVisitor visitor);
+
   @override
   String toString();
 }
@@ -58,6 +63,7 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
     this.arguments = const <String, String>{},
   }); /* : assert(name.isNotEmpty, 'Name must not be empty'); */
 
+
   @override
   final T route;
 
@@ -65,7 +71,7 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
   final Map<String, String> arguments;
 
   @override
-  List<OctopusNode> get children => <OctopusNode>[];
+  List<OctopusNode> get children => UnmodifiableListView(<OctopusNode>[]) ;
 
   @override
   map<R>({
@@ -79,6 +85,22 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
         'type': 'page',
         'arguments': arguments,
       };
+
+  /*
+  /// Parent of this node.
+  OctopusNode? _parent;
+
+  /// Walks the ancestors of this node.
+  void visitAncestorNodes(ConditionalNodeVisitor visitor) {
+    OctopusNode? ancestor = _parent;
+    while (ancestor != null && visitor(ancestor)) {
+      ancestor = ancestor._parent;
+    }
+  }
+  */
+
+  @override
+  void visitChildNodes(NodeVisitor visitor) => children.forEach(visitor);
 }
 
 /* @immutable
@@ -144,3 +166,22 @@ class OctopusNode$Switch {
 
 }
 */
+
+
+/// Signature for the callback to [BuildContext.visitChildElements].
+///
+/// The argument is the child being visited.
+///
+/// It is safe to call `element.visitChildElements` reentrantly within
+/// this callback.
+typedef NodeVisitor = void Function(OctopusNode element);
+
+/*
+/// Signature for the callback to [OctopusNode.visitAncestorNodes].
+///
+/// The argument is the ancestor being visited.
+///
+/// Return false to stop the walk.
+typedef ConditionalNodeVisitor = bool Function(OctopusNode element);
+*/
+

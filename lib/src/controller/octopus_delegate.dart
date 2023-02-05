@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:octopus/src/util/eval.dart';
 
 import '../error/error.dart';
 import '../state/octopus_state.dart';
@@ -51,23 +52,38 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   final NavigatorObserver _modalObserver = RouteObserver<ModalRoute<Object?>>();
 
   @override
-  Future<void> setNewRoutePath(covariant OctopusState configuration) {
-    // If unchanged, do nothing
-    //if (_currentConfiguration == configuration) {
-    //  return SynchronousFuture<void>(null);
-    //}
+  Future<void> setNewRoutePath(covariant OctopusState configuration) =>
+      $eval((pause) async {
+        OctopusState? newConfiguration = configuration;
+        if (configuration is InvalidOctopusState) {
+          newConfiguration = _currentConfiguration;
+          _onError?.call(configuration.error, configuration.stackTrace);
+        } else {
+          final error = configuration.validate();
+          if (error != null) {
+            newConfiguration = _currentConfiguration;
+            _onError?.call(error, StackTrace.current);
+          }
+        }
 
-    // ignore: todo
-    // TODO(plugfox): check if the new configuration is valid
-    // exclude duplicates
-    // Matiunin Mikhail <plugfox@gmail.com>, 06 December 2022
-    _currentConfiguration = configuration;
-    notifyListeners();
+        pause();
 
-    // Use [SynchronousFuture] so that the initial url is processed
-    // synchronously and remove unwanted initial animations on deep-linking
-    return SynchronousFuture<void>(null);
-  }
+        // TODO(plugfox): merge newConfiguration with currentConfiguration
+        // exclude dublicates and normolize
+
+        // If unchanged, do nothing
+        //if (_currentConfiguration == configuration) {
+        //  return SynchronousFuture<void>(null);
+        //}
+
+        _currentConfiguration = newConfiguration;
+        pause();
+        notifyListeners();
+
+        // Use [SynchronousFuture] so that the initial url is processed
+        // synchronously and remove unwanted initial animations on deep-linking
+        return SynchronousFuture<void>(null);
+      });
 
   @override
   Future<bool> popRoute() {

@@ -33,7 +33,7 @@ void main() => runZonedGuarded<void>(
       ),
     );
 
-// Sealed:
+// Sealed example:
 /*
   print(calculateArea(Circle(20)));
 

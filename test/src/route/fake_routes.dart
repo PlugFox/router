@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:octopus/octopus.dart';
 
-enum Routes implements OctopusRoute {
+enum FakeRoutes implements OctopusRoute {
   shop(ShopRoute()),
   category(CategoryRoute()),
   product(ProductRoute());
 
-  const Routes(this._route);
+  const FakeRoutes(this._route);
 
   final OctopusRoute _route;
 

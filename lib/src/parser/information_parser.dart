@@ -1,27 +1,27 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import 'package:octopus/src/state/octopus_state.dart';
 
 import '../../octopus.dart';
+import '../error/error.dart';
+import '../util/eval.dart';
 
 /// Converts between [RouteInformation] and [OctopusState].
 /// {@nodoc}
 @internal
 class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   /// {@nodoc}
-  OctopusInformationParser(
-      {required OctopusRoute home, required Set<OctopusRoute> routes})
-      : _home = OctopusState.single(_nodeFromRoute(route: home)!),
-        _routes = UnmodifiableMapView<String, OctopusRoute>(
+  OctopusInformationParser({required List<OctopusRoute> routes})
+      : _routes = UnmodifiableMapView<String, OctopusRoute>(
           <String, OctopusRoute>{
+            '/': routes.first,
             for (final route in routes) route.name: route,
           },
         );
 
-  final OctopusState _home;
   final UnmodifiableMapView<String, OctopusRoute> _routes;
 
   @override
@@ -34,25 +34,47 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   @override
   Future<OctopusState> parseRouteInformation(
     RouteInformation routeInformation,
-  ) {
-    final uri = Uri.tryParse(routeInformation.location ?? '/');
-    final state = routeInformation.state ?? <String, Object?>{};
-    if (uri is! Uri) {
-      assert(false, 'Invalid route information location');
-      return SynchronousFuture<OctopusState>(_home);
-    }
-    if (state is! Map<String, Object?>) {
-      assert(false, 'Invalid route information state');
-      return SynchronousFuture<OctopusState>(_home);
-    }
-    final location = _nodesFromUri(uri, _routes);
-    // TODO(plugfox): create OctopusState from location and state
-    // contain graph tree of OctopusNode and active list of OctopusNode
-    // active graph tree is changed by active list
-    return SynchronousFuture<OctopusState>(
-      OctopusState(current: location.last, nodes: location),
-    );
-  }
+  ) =>
+      $eval((pause) async {
+        final uri = Uri.tryParse(routeInformation.location ?? '/');
+        final state = routeInformation.state ?? <String, Object?>{};
+        if (uri is! Uri) {
+          assert(false, 'Invalid route information location');
+          return InvalidOctopusState(
+            OctopusInvalidRouteInformationLocation(routeInformation.location),
+            StackTrace.current,
+          );
+        }
+        if (state is! Map<String, Object?>) {
+          assert(false, 'Invalid route information state');
+          return InvalidOctopusState(
+            OctopusInvalidRouteInformationState(routeInformation.state),
+            StackTrace.current,
+          );
+        }
+        await pause();
+
+        List<OctopusNode<OctopusRoute>> location;
+        try {
+          location = $nodesFromUri(uri, _routes);
+          if (location.isEmpty) {
+            assert(false, 'Nodes not found');
+            return InvalidOctopusState(
+              OctopusRouterUnknownException(StateError('Nodes not found')),
+              StackTrace.current,
+            );
+          }
+        } on Object catch (error, stackTrace) {
+          return InvalidOctopusState(
+            OctopusRouterUnknownException(error),
+            stackTrace,
+          );
+        }
+        // TODO(plugfox): create OctopusState from location and state
+        // contain graph tree of OctopusNode and active list of OctopusNode
+        // active graph tree is changed by active list
+        return OctopusState(current: location.last, nodes: location);
+      });
 
   @override
   RouteInformation restoreRouteInformation(
@@ -94,12 +116,25 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
             .toList());
   }
 
-  static List<OctopusNode<OctopusRoute>> _nodesFromUri(
+  /// {@nodoc}
+  @internal
+  @visibleForTesting
+  static List<OctopusNode<OctopusRoute>> $nodesFromUri(
     Uri uri,
     Map<String, OctopusRoute> routes,
   ) {
     final segments = uri.pathSegments;
-    if (segments.isEmpty) return <OctopusNode<OctopusRoute>>[];
+    if (segments.isEmpty) {
+      final rootRoute = routes['/'];
+      if (rootRoute == null) {
+        throw StateError('Where is the root route?');
+      }
+      final root = _nodeFromRoute(route: routes['/']!, prev: null);
+      if (root == null) {
+        throw StateError('We can not create root node');
+      }
+      return <OctopusNode<OctopusRoute>>[root];
+    }
     final nodes = <OctopusNode<OctopusRoute>>[];
     OctopusNode<OctopusRoute>? prev() => nodes.isEmpty ? null : nodes.last;
     for (var i = segments.length - 1; i != 0; --i) {

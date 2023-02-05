@@ -13,7 +13,7 @@ import 'octopus_delegate.dart';
 abstract class Octopus {
   /// {@macro octopus}
   factory Octopus({
-    required Set<OctopusRoute> routes,
+    required List<OctopusRoute> routes,
     String? restorationScopeId,
     List<NavigatorObserver>? observers,
     TransitionDelegate<Object?>? transitionDelegate,
@@ -31,26 +31,20 @@ abstract class Octopus {
 class OctopusImpl implements Octopus {
   /// {@nodoc}
   factory OctopusImpl({
-    required Set<OctopusRoute> routes,
+    required List<OctopusRoute> routes,
     String? restorationScopeId = 'octopus',
     List<NavigatorObserver>? observers,
     TransitionDelegate<Object?>? transitionDelegate,
     RouteFactory? notFound,
     void Function(Object error, StackTrace stackTrace)? onError,
   }) {
-    if (routes.isEmpty) throw StateError('Routes must not be empty');
-    final OctopusRoute home;
-    try {
-      home = routes.singleWhere((route) => route.isHome);
-    } on StateError catch (error, stackTrace) {
-      Error.throwWithStackTrace(
-        StateError('Routes should contain one default home route'),
-        stackTrace,
-      );
+    if (routes.isEmpty) {
+      final error = StateError('Routes should contain at least one route');
+      onError?.call(error, StackTrace.current);
+      throw error;
     }
     final routeInformationProvider = OctopusInformationProvider();
     final routeInformationParser = OctopusInformationParser(
-      home: home,
       routes: routes,
     );
     final routerDelegate = OctopusDelegate(

@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:meta/meta.dart';
 import 'package:octopus/src/route/octopus_route.dart';
 
+import '../error/error.dart';
 import 'octopus_node.dart';
 
 /// {@template octopus_state}
@@ -48,6 +49,9 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
 
   /// Convert this state to JSON.
   Map<String, Object?> toJson();
+
+  /// Validate this state.
+  OctopusStateValidationException? validate();
 
   /// e.g.:
   /// Router
@@ -106,8 +110,13 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
         'nodes': map<Map<String, Object?>>((e) => e.toJson()).toList(),
       };
 
+  // TODO(plugfox): implement validation
   @override
-  String toString() => throw UnimplementedError();
+  OctopusStateValidationException? validate() => throw UnimplementedError();
+
+  // TODO(plugfox): OctopusState.toString()
+  @override
+  String toString() => 'OctopusState()';
 }
 
 mixin _OctopusNodeImmutableListMixin on IterableBase<OctopusNode<OctopusRoute>>
@@ -125,4 +134,52 @@ mixin _OctopusNodeImmutableListMixin on IterableBase<OctopusNode<OctopusRoute>>
 
   @override
   OctopusNode<OctopusRoute> operator [](int index) => _nodes.elementAt(index);
+}
+
+/// Invalid state, when something went wrong.
+/// Usually it's a result of a bug in the application
+/// or [OctopusInformationParser.parseRouteInformation].
+@internal
+class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
+    with _OctopusNodeImmutableListMixin
+    implements OctopusState {
+  /// Invalid state
+  const InvalidOctopusState(this.error, this.stackTrace);
+
+  /// Error
+  final OctopusException error;
+
+  /// Stack trace
+  final StackTrace stackTrace;
+
+  @override
+  List<OctopusNode<OctopusRoute>> get _nodes => throw UnimplementedError();
+
+  @override
+  OctopusState copyWith(
+          {OctopusNode<OctopusRoute>? newCurrent,
+          List<OctopusNode<OctopusRoute>>? newNodes}) =>
+      InvalidOctopusState(error, stackTrace);
+
+  @override
+  OctopusNode<OctopusRoute> get current => throw UnimplementedError();
+
+  @override
+  List<OctopusNode<OctopusRoute>> get location => throw UnimplementedError();
+
+  @override
+  OctopusState? maybePop() => throw UnimplementedError();
+
+  @override
+  Map<String, Object?> toJson() => throw UnimplementedError();
+
+  @override
+  OctopusStateValidationException? validate() =>
+      OctopusStateValidationException(
+        '/',
+        error.message,
+      );
+
+  @override
+  String toString() => error.toString();
 }

@@ -8,9 +8,6 @@ abstract class OctopusRoute {
   /// Name of the route.
   final String name;
 
-  /// Whether this route is home.
-  bool get isHome => false;
-
   // TODO(plugfox): visitor pattern
 }
 

@@ -31,3 +31,6 @@ build/
 
 # Flutter Version Manager
 .fvm/flutter_sdk
+
+# Example
+example/.flutter-plugins-dependencies
