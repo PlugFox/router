@@ -12,7 +12,14 @@ import 'octopus_delegate.dart';
 /// {@endtemplate}
 abstract class Octopus {
   /// {@macro octopus}
-  factory Octopus({required Set<OctopusRoute> routes}) = OctopusImpl;
+  factory Octopus({
+    required Set<OctopusRoute> routes,
+    String? restorationScopeId,
+    List<NavigatorObserver>? observers,
+    TransitionDelegate<Object?>? transitionDelegate,
+    RouteFactory? notFound,
+    void Function(Object error, StackTrace stackTrace)? onError,
+  }) = OctopusImpl;
 
   /// A convenient bundle to configure a [Router] widget.
   abstract final RouterConfig<OctopusState> config;
@@ -23,7 +30,14 @@ abstract class Octopus {
 @internal
 class OctopusImpl implements Octopus {
   /// {@nodoc}
-  factory OctopusImpl({required Set<OctopusRoute> routes}) {
+  factory OctopusImpl({
+    required Set<OctopusRoute> routes,
+    String? restorationScopeId = 'octopus',
+    List<NavigatorObserver>? observers,
+    TransitionDelegate<Object?>? transitionDelegate,
+    RouteFactory? notFound,
+    void Function(Object error, StackTrace stackTrace)? onError,
+  }) {
     if (routes.isEmpty) throw StateError('Routes must not be empty');
     final OctopusRoute home;
     try {
@@ -39,7 +53,13 @@ class OctopusImpl implements Octopus {
       home: home,
       routes: routes,
     );
-    final routerDelegate = OctopusDelegate();
+    final routerDelegate = OctopusDelegate(
+      restorationScopeId: restorationScopeId,
+      observers: observers,
+      transitionDelegate: transitionDelegate,
+      notFound: notFound,
+      onError: onError,
+    );
     final backButtonDispatcher = RootBackButtonDispatcher();
     return OctopusImpl._(
       routeInformationProvider: routeInformationProvider,

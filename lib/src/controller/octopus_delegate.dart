@@ -1,11 +1,42 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import '../error/error.dart';
 import '../state/octopus_state.dart';
 import '../widget/inherited_octopus.dart';
 
 /// Octopus delegate.
 class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
+  /// Octopus delegate.
+  OctopusDelegate({
+    String? restorationScopeId = 'octopus',
+    List<NavigatorObserver>? observers,
+    TransitionDelegate<Object?>? transitionDelegate,
+    RouteFactory? notFound,
+    void Function(Object error, StackTrace stackTrace)? onError,
+  })  : _restorationScopeId = restorationScopeId,
+        _observers = observers,
+        _transitionDelegate =
+            transitionDelegate ?? const DefaultTransitionDelegate<Object?>(),
+        _notFound = notFound,
+        _onError = onError;
+
+  /// The restoration scope id for the navigator.
+  final String? _restorationScopeId;
+
+  /// Observers for the navigator.
+  final List<NavigatorObserver>? _observers;
+
+  /// Transition delegate.
+  final TransitionDelegate<Object?> _transitionDelegate;
+
+  /// Not found route.
+  final RouteFactory? _notFound;
+
+  /// Error handler.
+  final void Function(Object error, StackTrace stackTrace)? _onError;
+
+  /// Current configuration.
   OctopusState? _currentConfiguration;
 
   @override
@@ -49,19 +80,18 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   @override
   Widget build(BuildContext context) => Inheritedoctopus(
         child: Navigator(
+          restorationScopeId: _restorationScopeId,
           reportsRouteUpdateToEngine: true,
           observers: <NavigatorObserver>[
             _modalObserver,
-            // TODO(plugfox): Additional observers from the [Octopus] class
-            // also add RouterAware
+            ...?_observers,
           ],
+          transitionDelegate: _transitionDelegate,
           pages: const <Page<Object?>>[
             // TODO(plugfox): Pages from the current [OctopusState]
           ],
           onPopPage: _onPopPage,
-          // TODO(plugfox): restorationScopeId: restorationScopeId,
-          // TODO(plugfox): transitionDelegate: throw UnimplementedError(),
-          // TODO(plugfox): onUnknownRoute: _onUnknownRoute,
+          onUnknownRoute: _onUnknownRoute,
         ),
       );
 
@@ -71,5 +101,15 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
     if (popped == null) return false;
     setNewRoutePath(popped);
     return true;
+  }
+
+  Route<Object?>? _onUnknownRoute(RouteSettings settings) {
+    final route = _notFound?.call(settings);
+    if (route != null) return route;
+    _onError?.call(
+      OctopusUnknownRouteException(settings),
+      StackTrace.current,
+    );
+    return null;
   }
 }
