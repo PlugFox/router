@@ -58,7 +58,6 @@ abstract class ErrorUtil {
     }
   }
 
-  @alwaysThrows
   static Never throwWithStackTrace(Object error, StackTrace stackTrace) =>
       Error.throwWithStackTrace(error, stackTrace);
 
