@@ -6,24 +6,6 @@ include: package:flutter_lints/flutter.yaml
 
 # Analyzer options
 analyzer:
-  # Exclude files from analysis. Must be relative to the root of the package.
-  exclude:
-    # Build
-    - "build/**"
-    # Tests
-    - "test/**.mocks.dart"
-    - ".test_coverage.dart"
-    - "coverage/**"
-    # Assets
-    - "assets/**"
-    # Generated
-    # Flutter Version Manager
-    - ".fvm/**"
-    # Tools
-    - "tool/**"
-    - "scripts/**"
-    - ".dart_tool/**"
-
   # Enable the following options to enable strong mode.
   language:
     strict-casts: true
@@ -46,11 +28,6 @@ analyzer:
 
   # Set the following options to true to enable additional analysis.
   errors:
-    # todo: uncomment to enable
-    # Public packages
-    #public_member_api_docs: error
-    #lines_longer_than_80_chars: error
-
     # Info
     todo: info
     directives_ordering: info
@@ -72,13 +49,15 @@ analyzer:
     always_require_non_null_named_parameters: error
 
     # Disable rules
+    public_member_api_docs: ignore
+    lines_longer_than_80_chars: ignore
 
 # Lint rules
 linter:
   rules:
     # Public packages
-    public_member_api_docs: true
-    lines_longer_than_80_chars: true
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
 
     # Enabling rules
 

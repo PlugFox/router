@@ -1,9 +1,11 @@
+// @dart = 3.0
+
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:octopus/octopus.dart';
 
 @sealed
-abstract class Routes {
+sealed class Routes {
   Routes._();
 
   static const OctopusRoute shop = ShopRoute();

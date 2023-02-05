@@ -1,3 +1,5 @@
+// @dart = 3.0
+
 library octopus;
 
 export 'src/controller/octopus.dart' show Octopus;

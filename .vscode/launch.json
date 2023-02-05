@@ -11,7 +11,8 @@
         "ENVIRONMENT": "develop"
       },
       "args": [
-        "--dart-define=ENVIRONMENT=develop"
+        "--dart-define=ENVIRONMENT=develop",
+        "--enable-experiment=sealed-class,records,patterns"
       ]
     }
   ]
