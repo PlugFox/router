@@ -168,16 +168,16 @@ class OctopusNode$Switch {
 */
 
 
-/// Signature for the callback to [BuildContext.visitChildElements].
+/// Signature for the callback to [OctopusNode.visitChildNodes].
 ///
 /// The argument is the child being visited.
 ///
-/// It is safe to call `element.visitChildElements` reentrantly within
+/// It is safe to call `node.visitChildNodes` reentrantly within
 /// this callback.
 typedef NodeVisitor = void Function(OctopusNode element);
 
 /*
-/// Signature for the callback to [OctopusNode.visitAncestorNodes].
+/// Signature for the callback to [OctopusNode.visitChildNodes].
 ///
 /// The argument is the ancestor being visited.
 ///
