@@ -35,8 +35,8 @@ analyzer:
     - patterns
     - sealed-class
     - records
+    - class-modifiers
     #- macros
-    #- class-modifiers
     #- const-functions
     #- extension-types
     #- inference-update-2

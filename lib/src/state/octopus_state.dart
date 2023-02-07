@@ -53,6 +53,9 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   /// Validate this state.
   OctopusStateValidationException? validate();
 
+  /// Walks the children of this node.
+  void visitChildNodes(NodeVisitor visitor);
+
   /// e.g.:
   /// Router
   /// ├── Tabs
@@ -112,7 +115,10 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
 
   // TODO(plugfox): implement validation
   @override
-  OctopusStateValidationException? validate() => throw UnimplementedError();
+  OctopusStateValidationException? validate() => null;
+
+  @override
+  void visitChildNodes(NodeVisitor visitor) => _nodes.forEach(visitor);
 
   // TODO(plugfox): OctopusState.toString()
   @override
@@ -179,6 +185,9 @@ class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
         '/',
         error.message,
       );
+
+  @override
+  void visitChildNodes(NodeVisitor visitor) => throw UnimplementedError();
 
   @override
   String toString() => error.toString();

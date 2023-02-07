@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:octopus/src/state/octopus_state.dart';
 
 import '../../octopus.dart';
 import '../error/error.dart';
-import '../util/eval.dart';
 
 /// Converts between [RouteInformation] and [OctopusState].
 /// {@nodoc}
@@ -34,47 +34,55 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   @override
   Future<OctopusState> parseRouteInformation(
     RouteInformation routeInformation,
-  ) =>
-      $eval((pause) async {
-        final uri = Uri.tryParse(routeInformation.location ?? '/');
-        final state = routeInformation.state ?? <String, Object?>{};
-        if (uri is! Uri) {
-          assert(false, 'Invalid route information location');
-          return InvalidOctopusState(
-            OctopusInvalidRouteInformationLocation(routeInformation.location),
-            StackTrace.current,
-          );
-        }
-        if (state is! Map<String, Object?>) {
-          assert(false, 'Invalid route information state');
-          return InvalidOctopusState(
-            OctopusInvalidRouteInformationState(routeInformation.state),
-            StackTrace.current,
-          );
-        }
-        await pause();
+  ) {
+    final uri = Uri.tryParse(routeInformation.location ?? '/');
+    final state = routeInformation.state ?? <String, Object?>{};
+    if (uri is! Uri) {
+      assert(false, 'Invalid route information location');
+      return SynchronousFuture(
+        InvalidOctopusState(
+          OctopusInvalidRouteInformationLocation(routeInformation.location),
+          StackTrace.current,
+        ),
+      );
+    }
+    if (state is! Map<String, Object?>) {
+      assert(false, 'Invalid route information state');
+      return SynchronousFuture(
+        InvalidOctopusState(
+          OctopusInvalidRouteInformationState(routeInformation.state),
+          StackTrace.current,
+        ),
+      );
+    }
 
-        List<OctopusNode<OctopusRoute>> location;
-        try {
-          location = $nodesFromUri(uri, _routes);
-          if (location.isEmpty) {
-            assert(false, 'Nodes not found');
-            return InvalidOctopusState(
-              OctopusRouterUnknownException(StateError('Nodes not found')),
-              StackTrace.current,
-            );
-          }
-        } on Object catch (error, stackTrace) {
-          return InvalidOctopusState(
-            OctopusRouterUnknownException(error),
-            stackTrace,
-          );
-        }
-        // TODO(plugfox): create OctopusState from location and state
-        // contain graph tree of OctopusNode and active list of OctopusNode
-        // active graph tree is changed by active list
-        return OctopusState(current: location.last, nodes: location);
-      });
+    List<OctopusNode<OctopusRoute>> location;
+    try {
+      location = $nodesFromUri(uri, _routes);
+      if (location.isEmpty) {
+        assert(false, 'Nodes not found');
+        return SynchronousFuture(
+          InvalidOctopusState(
+            OctopusRouterUnknownException(StateError('Nodes not found')),
+            StackTrace.current,
+          ),
+        );
+      }
+    } on Object catch (error, stackTrace) {
+      return SynchronousFuture(
+        InvalidOctopusState(
+          OctopusRouterUnknownException(error),
+          stackTrace,
+        ),
+      );
+    }
+    // TODO(plugfox): create OctopusState from location and state
+    // contain graph tree of OctopusNode and active list of OctopusNode
+    // active graph tree is changed by active list
+    return SynchronousFuture(
+      OctopusState(current: location.last, nodes: location),
+    );
+  }
 
   @override
   RouteInformation restoreRouteInformation(

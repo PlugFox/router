@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:octopus/src/util/eval.dart';
+import 'package:flutter/material.dart';
 
 import '../error/error.dart';
 import '../state/octopus_state.dart';
@@ -40,9 +39,15 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   /// Current configuration.
   OctopusState? _currentConfiguration;
 
+  /// Has initial configuration and initialisated.
+  @protected
+  bool get hasConfiguration => _currentConfiguration != null;
+
   @override
   OctopusState get currentConfiguration {
     final state = _currentConfiguration;
+    _onError?.call(
+        UnsupportedError('Initial configuration not set'), StackTrace.current);
     if (state == null) throw UnsupportedError('Initial configuration not set');
     return state;
   }
@@ -52,38 +57,42 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   final NavigatorObserver _modalObserver = RouteObserver<ModalRoute<Object?>>();
 
   @override
-  Future<void> setNewRoutePath(covariant OctopusState configuration) =>
-      $eval((pause) async {
-        OctopusState? newConfiguration = configuration;
-        if (configuration is InvalidOctopusState) {
-          newConfiguration = _currentConfiguration;
-          _onError?.call(configuration.error, configuration.stackTrace);
-        } else {
-          final error = configuration.validate();
-          if (error != null) {
-            newConfiguration = _currentConfiguration;
-            _onError?.call(error, StackTrace.current);
-          }
-        }
+  Future<void> setNewRoutePath(covariant OctopusState configuration) {
+    OctopusState? newConfiguration = configuration;
+    if (configuration is InvalidOctopusState) {
+      newConfiguration = _currentConfiguration;
+      _onError?.call(configuration.error, configuration.stackTrace);
+    } else {
+      final error = configuration.validate();
+      if (error != null) {
+        newConfiguration = _currentConfiguration;
+        _onError?.call(error, StackTrace.current);
+      }
+    }
 
-        pause();
+    // TODO(plugfox): merge newConfiguration with currentConfiguration
+    // exclude dublicates and normolize
 
-        // TODO(plugfox): merge newConfiguration with currentConfiguration
-        // exclude dublicates and normolize
+    // If unchanged, do nothing
+    //if (_currentConfiguration == configuration) {
+    //  return SynchronousFuture<void>(null);
+    //}
 
-        // If unchanged, do nothing
-        //if (_currentConfiguration == configuration) {
-        //  return SynchronousFuture<void>(null);
-        //}
+    _currentConfiguration = newConfiguration;
+    notifyListeners();
 
-        _currentConfiguration = newConfiguration;
-        pause();
-        notifyListeners();
+    // Use [SynchronousFuture] so that the initial url is processed
+    // synchronously and remove unwanted initial animations on deep-linking
+    return SynchronousFuture<void>(null);
+  }
 
-        // Use [SynchronousFuture] so that the initial url is processed
-        // synchronously and remove unwanted initial animations on deep-linking
-        return SynchronousFuture<void>(null);
-      });
+  @override
+  Future<void> setInitialRoutePath(covariant OctopusState configuration) =>
+      setNewRoutePath(configuration);
+
+  @override
+  Future<void> setRestoredRoutePath(covariant OctopusState configuration) =>
+      setNewRoutePath(configuration);
 
   @override
   Future<bool> popRoute() {
@@ -94,20 +103,20 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   }
 
   @override
-  Widget build(BuildContext context) => Inheritedoctopus(
-        child: Navigator(
-          restorationScopeId: _restorationScopeId,
-          reportsRouteUpdateToEngine: true,
-          observers: <NavigatorObserver>[
-            _modalObserver,
-            ...?_observers,
-          ],
-          transitionDelegate: _transitionDelegate,
-          pages: const <Page<Object?>>[
-            // TODO(plugfox): Pages from the current [OctopusState]
-          ],
-          onPopPage: _onPopPage,
-          onUnknownRoute: _onUnknownRoute,
+  Widget build(BuildContext context) => InheritedOctopus(
+        child: Builder(
+          builder: (context) => Navigator(
+            restorationScopeId: _restorationScopeId,
+            reportsRouteUpdateToEngine: true,
+            observers: <NavigatorObserver>[
+              _modalObserver,
+              ...?_observers,
+            ],
+            transitionDelegate: _transitionDelegate,
+            pages: _buildPage(context),
+            onPopPage: _onPopPage,
+            onUnknownRoute: _onUnknownRoute,
+          ),
         ),
       );
 
@@ -127,5 +136,42 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
       StackTrace.current,
     );
     return null;
+  }
+
+  List<Page<Object?>> _buildPage(BuildContext context) {
+    final state = _currentConfiguration;
+    Iterable<Page<Object?>> pageGenerator() sync* {
+      if (state == null || state is InvalidOctopusState) return;
+      for (final node in state) {
+        yield node.route.buildPage(context, node.arguments);
+      }
+    }
+
+    final pages = pageGenerator().toList();
+    if (pages.isNotEmpty) return pages;
+
+    const errorMessage = 'The Navigator.pages must not be empty to use the '
+        'Navigator.pages API';
+    final error = FlutterError(errorMessage);
+    _onError?.call(
+      error,
+      StackTrace.current,
+    );
+    return <Page<Object?>>[
+      MaterialPage(
+        child: Scaffold(
+          body: SafeArea(
+            child: ErrorWidget.withDetails(
+              message: errorMessage,
+              error: error,
+            ),
+          ),
+        ),
+        arguments: <String, Object?>{
+          'message': errorMessage,
+          'error': error,
+        },
+      )
+    ];
   }
 }

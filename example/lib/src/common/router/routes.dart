@@ -3,27 +3,29 @@
 import 'package:flutter/material.dart';
 import 'package:octopus/octopus.dart';
 
-enum Routes implements OctopusRoute {
+import '../../feature/category/widget/category_screen.dart';
+import '../../feature/product/widget/product_screen.dart';
+import '../../feature/shop/widget/shop_screen.dart';
+
+enum Routes with OctopusRouteOwner {
   shop(ShopRoute()),
   category(CategoryRoute()),
   product(ProductRoute());
 
-  const Routes(this._route);
-
-  final OctopusRoute _route;
+  const Routes(this.route);
 
   @override
-  String get name => _route.name;
+  final OctopusRoute route;
 }
 
 class ShopRoute extends OctopusRoute$Page {
   const ShopRoute() : super('Shop');
 
   @override
-  Page<void> call(BuildContext context, Map<String, String> arguments) =>
+  Page<void> buildPage(BuildContext context, Map<String, String> arguments) =>
       MaterialPage<void>(
         key: ValueKey<String>(name),
-        child: const Text('Shop'),
+        child: const ShopScreen(),
       );
 }
 
@@ -31,11 +33,13 @@ class CategoryRoute extends OctopusRoute$Page {
   const CategoryRoute() : super('Category');
 
   @override
-  Page<void> call(BuildContext context, Map<String, String> arguments) {
+  Page<void> buildPage(BuildContext context, Map<String, String> arguments) {
     final id = arguments['id'];
     return MaterialPage<void>(
       key: ValueKey<String>('$name@id=$id'),
-      child: const Text('Category'),
+      child: CategoryScreen(
+        id: id,
+      ),
     );
   }
 }
@@ -44,11 +48,13 @@ class ProductRoute extends OctopusRoute$Page {
   const ProductRoute() : super('Product');
 
   @override
-  Page<void> call(BuildContext context, Map<String, String> arguments) {
+  Page<void> buildPage(BuildContext context, Map<String, String> arguments) {
     final id = arguments['id'];
     return MaterialPage<void>(
       key: ValueKey<String>('$name@id=$id'),
-      child: const Text('Product'),
+      child: ProductScreen(
+        id: id,
+      ),
     );
   }
 }

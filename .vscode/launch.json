@@ -12,7 +12,7 @@
       },
       "args": [
         "--dart-define=ENVIRONMENT=develop",
-        "--enable-experiment=sealed-class,records,patterns"
+        "--enable-experiment=sealed-class,records,patterns,class-modifiers"
       ]
     }
   ]

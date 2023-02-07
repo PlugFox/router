@@ -3,13 +3,13 @@ import 'package:meta/meta.dart';
 
 /// {@nodoc}
 @internal
-class Inheritedoctopus extends InheritedWidget {
+class InheritedOctopus extends InheritedWidget {
   /// {@macro inherited_octopus}
-  const Inheritedoctopus({
+  const InheritedOctopus({
     required super.child,
     super.key,
   });
 
   @override
-  bool updateShouldNotify(Inheritedoctopus oldWidget) => false;
+  bool updateShouldNotify(InheritedOctopus oldWidget) => false;
 }

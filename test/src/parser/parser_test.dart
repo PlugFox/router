@@ -9,7 +9,9 @@ void main() => group('parser', () {
       late RouteInformationParser<OctopusState> parser;
 
       setUpAll(() {
-        parser = OctopusInformationParser(routes: FakeRoutes.values);
+        parser = OctopusInformationParser(
+          routes: FakeRoutes.values.map<OctopusRoute>((e) => e.route).toList(),
+        );
       });
 
       test('parseRouteInformation_root', () {
