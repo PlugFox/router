@@ -3,10 +3,8 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:octopus/octopus.dart';
 
 import 'src/common/initialization/initialization.dart';
-import 'src/common/router/routes.dart';
 import 'src/common/util/error_util.dart';
 import 'src/common/util/logging.dart';
 import 'src/common/widget/app.dart';
@@ -22,8 +20,7 @@ void main() => runZonedGuarded<void>(
           runApp(const AppError());
           return;
         }
-        final router = Octopus(routes: Routes.values);
-        runApp(App(routerConfig: router.config));
+        runApp(const App());
       },
       severe,
       zoneSpecification: ZoneSpecification(

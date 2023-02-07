@@ -3,9 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:octopus/octopus.dart';
 
-import '../../feature/category/widget/category_screen.dart';
-import '../../feature/product/widget/product_screen.dart';
-import '../../feature/shop/widget/shop_screen.dart';
+import 'screens.dart';
 
 enum Routes with OctopusRouteOwner {
   shop(ShopRoute()),

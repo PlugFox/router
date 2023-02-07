@@ -2,17 +2,25 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:octopus/octopus.dart';
 
 import '../localization/localization.dart';
+import '../router/routes.dart';
 
 /// {@template app}
 /// App widget
 /// {@endtemplate}
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   /// {@macro app}
-  const App({required this.routerConfig, super.key});
+  const App({super.key});
 
-  final RouterConfig<Object> routerConfig;
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  final RouterConfig<Object> routerConfig =
+      Octopus(routes: Routes.values).config;
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
