@@ -12,6 +12,7 @@ class OctopusDelegate extends RouterDelegate<OctopusState>
     with ChangeNotifier, _OctopusStateObserver {
   /// Octopus delegate.
   OctopusDelegate({
+    required OctopusState initialState,
     String? restorationScopeId = 'octopus',
     List<NavigatorObserver>? observers,
     TransitionDelegate<Object?>? transitionDelegate,
@@ -22,7 +23,9 @@ class OctopusDelegate extends RouterDelegate<OctopusState>
         _transitionDelegate =
             transitionDelegate ?? const DefaultTransitionDelegate<Object?>(),
         _notFound = notFound,
-        _onError = onError;
+        _onError = onError {
+    _value = initialState;
+  }
 
   /// The restoration scope id for the navigator.
   final String? _restorationScopeId;
@@ -45,10 +48,6 @@ class OctopusDelegate extends RouterDelegate<OctopusState>
   @internal
   set $controller(Octopus controller) => _controller = controller;
 
-  /// Has initial configuration and initialisated.
-  @protected
-  bool get hasConfiguration => _value != null;
-
   /// Current configuration.
   @override
   OctopusState get currentConfiguration => _handleErrors(() {
@@ -62,6 +61,7 @@ class OctopusDelegate extends RouterDelegate<OctopusState>
   @override
   Future<void> setNewRoutePath(covariant OctopusState configuration) {
     _handleErrors(() {
+      // TODO(plugfox): make it async and show splash screen while loading
       OctopusState? newConfiguration = configuration;
       if (configuration is InvalidOctopusState) {
         newConfiguration = _value;
@@ -150,6 +150,7 @@ class OctopusDelegate extends RouterDelegate<OctopusState>
         final state = value;
         Iterable<Page<Object?>> pageGenerator() sync* {
           if (state is InvalidOctopusState) return;
+          // TODO(plugfox): tree shaking
           for (final node in state) {
             yield node.route.buildPage(context, node.arguments);
           }
@@ -201,11 +202,10 @@ mixin _OctopusStateObserver
     implements ValueListenable<OctopusState> {
   @protected
   @nonVirtual
-  OctopusState? _value;
+  late OctopusState _value;
 
   @override
-  OctopusState get value =>
-      _value ?? (throw UnsupportedError('Initial configuration not set'));
+  OctopusState get value => _value;
 
   @protected
   @nonVirtual

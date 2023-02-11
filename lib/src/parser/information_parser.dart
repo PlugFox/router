@@ -36,6 +36,7 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   Future<OctopusState> parseRouteInformation(
     RouteInformation routeInformation,
   ) {
+    // TODO(plugfox): make it async
     final uri = Uri.tryParse(routeInformation.location ?? '/');
     final state = routeInformation.state ?? <String, Object?>{};
     if (uri is! Uri) {

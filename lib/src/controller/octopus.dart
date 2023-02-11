@@ -1,6 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import 'package:octopus/src/state/octopus_node.dart';
 
 import '../parser/information_parser.dart';
 import '../provider/information_provider.dart';
@@ -74,7 +76,9 @@ class OctopusImpl extends Octopus
   }) {
     // TODO(plugfox): validate routes names uniqueness.
     final list = routes.map<OctopusRoute>((e) => e.route).toList();
-    if (list.isEmpty) {
+    // Get first page route without any required arguments.
+    final firstPage = list.whereType<OctopusRoute$Page>().firstOrNull;
+    if (firstPage == null) {
       final error = StateError('Routes list should contain at least one route');
       onError?.call(error, StackTrace.current);
       throw error;
@@ -84,6 +88,7 @@ class OctopusImpl extends Octopus
       routes: list,
     );
     final routerDelegate = OctopusDelegate(
+      initialState: OctopusState.single(OctopusNode.page(route: firstPage)),
       restorationScopeId: restorationScopeId,
       observers: observers,
       transitionDelegate: transitionDelegate,
