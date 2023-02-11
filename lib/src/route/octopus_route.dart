@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
 
 /// Base class for all routes.
 @immutable
@@ -10,7 +9,6 @@ abstract class OctopusRoute {
   final String name;
 
   /// Build [Page] for this route.
-  @visibleForOverriding
   Page<Object?> buildPage(BuildContext context, Map<String, String> arguments);
 }
 

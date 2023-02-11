@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart' show RouteSettings;
-
+import 'package:meta/meta.dart';
 
 /// Error handling for Octopus router.
 typedef OctopusErrorCallback = void Function(
@@ -8,16 +8,14 @@ typedef OctopusErrorCallback = void Function(
 );
 
 /// Octopus router exception.
-// ignore: public_member_api_docs
-sealed class OctopusException implements Exception {
-
+@sealed
+abstract class OctopusException implements Exception {
   /// Exception message.
   abstract final String message;
 
   @override
   String toString() => 'OctopusException: $message';
 }
-
 
 /// {@template error_unknown_route}
 /// Octopus router exception for invalid route.
@@ -37,11 +35,9 @@ class OctopusUnknownRouteException implements OctopusException {
   @override
   String get message => 'Unknown route: ${routeSettings.name}';
 
-
   @override
   String toString() => message;
 }
-
 
 /// {@template error_invalid_route_information_location}
 /// Invalid route information location
@@ -54,14 +50,12 @@ class OctopusInvalidRouteInformationLocation implements OctopusException {
   final String? location;
 
   @override
-  String get message =>
-  'Invalid route information location: '
-  '${location ?? 'null'}';
+  String get message => 'Invalid route information location: '
+      '${location ?? 'null'}';
 
   @override
   String toString() => message;
 }
-
 
 /// {@template error_invalid_route_information_state}
 /// Invalid route information state
@@ -80,7 +74,6 @@ class OctopusInvalidRouteInformationState implements OctopusException {
   String toString() => message;
 }
 
-
 /// {@template error_invalid_route_information_state}
 /// Invalid route information state
 /// {@endtemplate}
@@ -97,7 +90,6 @@ class OctopusStateValidationException implements OctopusException {
   @override
   String toString() => message;
 }
-
 
 /// {@template error_unknown_exception}
 /// Octopus router unknown exception.

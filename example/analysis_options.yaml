@@ -13,18 +13,18 @@ analyzer:
     strict-inference: true
 
   # Enable the following options to enable new language features.
-  enable-experiment:
-    - patterns
-    - sealed-class
-    - records
-    - class-modifiers
-    #- macros
-    #- const-functions
-    #- extension-types
-    #- inference-update-2
-    #- inline-class
-    #- value-class
-    #- variance
+  #enable-experiment:
+  #  - patterns
+  #  - sealed-class
+  #  - records
+  #  - class-modifiers
+  #  - macros
+  #  - const-functions
+  #  - extension-types
+  #  - inference-update-2
+  #  - inline-class
+  #  - value-class
+  #  - variance
 
   # Set the following options to true to enable additional analysis.
   errors:

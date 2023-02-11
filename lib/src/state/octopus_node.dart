@@ -5,8 +5,9 @@ import 'package:meta/meta.dart';
 import '../route/octopus_route.dart';
 
 /// Base class for all nodes.
+@sealed
 @immutable
-sealed class OctopusNode<T extends OctopusRoute> {
+abstract class OctopusNode<T extends OctopusRoute> {
   /// Page node.
   const factory OctopusNode.page({
     required T route,
@@ -63,7 +64,6 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
     this.arguments = const <String, String>{},
   }); /* : assert(name.isNotEmpty, 'Name must not be empty'); */
 
-
   @override
   final T route;
 
@@ -71,7 +71,7 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
   final Map<String, String> arguments;
 
   @override
-  List<OctopusNode> get children => UnmodifiableListView(<OctopusNode>[]) ;
+  List<OctopusNode> get children => UnmodifiableListView(<OctopusNode>[]);
 
   @override
   map<R>({
@@ -166,7 +166,6 @@ class OctopusNode$Switch {
 
 }
 */
-
 
 /// Signature for the callback to [OctopusNode.visitChildNodes].
 ///
