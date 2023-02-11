@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:octopus/src/controller/octopus_singleton.dart';
 
 import '../controller/octopus.dart';
 import '../state/octopus_state.dart';
@@ -25,8 +26,12 @@ class OctopusNavigator extends Navigator {
   final Octopus controller;
 
   /// {@nodoc}
-  static Octopus get $controller => _$controller ?? _notExistOrDisposed();
-  static Octopus? _$controller;
+  static Octopus get $controller {
+    if (_$controllers.isEmpty) _notExistOrDisposed();
+    return _$controllers.first;
+  }
+
+  static final Set<Octopus> _$controllers = <Octopus>{};
   static Never _notExistOrDisposed() => throw ArgumentError(
         'The octopus controller is not exist or disposed.'
             'Try to create the new one or use it after first build.',
@@ -39,13 +44,8 @@ class OctopusNavigator extends Navigator {
   /// {@nodoc}
   static Octopus of(BuildContext context, {bool listen = false}) {
     if (listen) Router.of<OctopusState>(context);
-    return _$controller ?? _notFoundInheritedWidgetOfExactType();
+    return $controller;
   }
-
-  static Never _notFoundInheritedWidgetOfExactType() => throw ArgumentError(
-        'Out of scope, not Router widget found in the element tree.',
-        'router_out_of_scope',
-      );
 
   @override
   StatefulElement createElement() => _OctopusNavigatorElement(this);
@@ -59,19 +59,13 @@ class _OctopusNavigatorElement extends StatefulElement {
 
   @override
   void mount(Element? parent, Object? newSlot) {
-    OctopusNavigator._$controller = widget.controller;
+    $octopusSingleton = widget.controller;
     super.mount(parent, newSlot);
   }
 
   @override
   void update(covariant OctopusNavigator newWidget) {
-    OctopusNavigator._$controller = newWidget.controller;
+    $octopusSingleton = widget.controller;
     super.update(newWidget);
-  }
-
-  @override
-  void unmount() {
-    super.unmount();
-    OctopusNavigator._$controller = null;
   }
 }

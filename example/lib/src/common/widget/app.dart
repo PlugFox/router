@@ -6,6 +6,7 @@ import 'package:octopus/octopus.dart';
 
 import '../localization/localization.dart';
 import '../router/routes.dart';
+import 'octopus_state_observer.dart';
 
 /// {@template app}
 /// App widget
@@ -41,10 +42,9 @@ class _AppState extends State<App> {
         supportedLocales: Localization.supportedLocales,
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
-          child: Banner(
-            message: 'PREVIEW',
-            location: BannerLocation.topEnd,
-            child: child,
+          child: OctopusStateObserver(
+            observer: Octopus.instance.stateObserver,
+            child: child ?? const SizedBox.shrink(),
           ),
         ),
       );

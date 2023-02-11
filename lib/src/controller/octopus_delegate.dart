@@ -8,7 +8,8 @@ import '../state/octopus_state.dart';
 import 'octopus.dart';
 
 /// Octopus delegate.
-class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
+class OctopusDelegate extends RouterDelegate<OctopusState>
+    with ChangeNotifier, _OctopusStateObserver {
   /// Octopus delegate.
   OctopusDelegate({
     String? restorationScopeId = 'octopus',
@@ -44,21 +45,15 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   @internal
   set $controller(Octopus controller) => _controller = controller;
 
-  /// Current configuration.
-  OctopusState? _currentConfiguration;
-
   /// Has initial configuration and initialisated.
   @protected
-  bool get hasConfiguration => _currentConfiguration != null;
+  bool get hasConfiguration => _value != null;
 
+  /// Current configuration.
   @override
-  OctopusState get currentConfiguration {
-    final state = _currentConfiguration;
-    _onError?.call(
-        UnsupportedError('Initial configuration not set'), StackTrace.current);
-    if (state == null) throw UnsupportedError('Initial configuration not set');
-    return state;
-  }
+  OctopusState get currentConfiguration => _handleErrors(() {
+        return value;
+      });
 
   /// WidgetApp's navigator.
   NavigatorState? get navigator => _modalObserver.navigator;
@@ -66,28 +61,30 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
 
   @override
   Future<void> setNewRoutePath(covariant OctopusState configuration) {
-    OctopusState? newConfiguration = configuration;
-    if (configuration is InvalidOctopusState) {
-      newConfiguration = _currentConfiguration;
-      _onError?.call(configuration.error, configuration.stackTrace);
-    } else {
-      final error = configuration.validate();
-      if (error != null) {
-        newConfiguration = _currentConfiguration;
-        _onError?.call(error, StackTrace.current);
+    _handleErrors(() {
+      OctopusState? newConfiguration = configuration;
+      if (configuration is InvalidOctopusState) {
+        newConfiguration = _value;
+        _onError?.call(configuration.error, configuration.stackTrace);
+      } else {
+        final error = configuration.validate();
+        if (error != null) {
+          newConfiguration = _value;
+          _onError?.call(error, StackTrace.current);
+        }
       }
-    }
 
-    // TODO(plugfox): merge newConfiguration with currentConfiguration
-    // exclude dublicates and normolize
+      // TODO(plugfox): merge newConfiguration with currentConfiguration
+      // exclude dublicates and normolize
 
-    // If unchanged, do nothing
-    //if (_currentConfiguration == configuration) {
-    //  return SynchronousFuture<void>(null);
-    //}
+      // If unchanged, do nothing
+      //if (_currentConfiguration == configuration) {
+      //  return SynchronousFuture<void>(null);
+      //}
 
-    _currentConfiguration = newConfiguration;
-    notifyListeners();
+      changeState(newConfiguration);
+      notifyListeners();
+    }, (_, __) {});
 
     // Use [SynchronousFuture] so that the initial url is processed
     // synchronously and remove unwanted initial animations on deep-linking
@@ -103,12 +100,12 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
       setNewRoutePath(configuration);
 
   @override
-  Future<bool> popRoute() {
-    final nav = navigator;
-    assert(nav != null, 'Navigator is not attached to the OctopusDelegate');
-    if (nav == null) return SynchronousFuture<bool>(false);
-    return nav.maybePop();
-  }
+  Future<bool> popRoute() => _handleErrors(() {
+        final nav = navigator;
+        assert(nav != null, 'Navigator is not attached to the OctopusDelegate');
+        if (nav == null) return SynchronousFuture<bool>(false);
+        return nav.maybePop();
+      });
 
   @override
   Widget build(BuildContext context) => OctopusNavigator(
@@ -125,58 +122,96 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
         onUnknownRoute: _onUnknownRoute,
       );
 
-  bool _onPopPage(Route<Object?> route, Object? result) {
-    if (!route.didPop(result)) return false;
-    final popped = _currentConfiguration?.maybePop();
-    if (popped == null) return false;
-    setNewRoutePath(popped);
-    return true;
-  }
-
-  Route<Object?>? _onUnknownRoute(RouteSettings settings) {
-    final route = _notFound?.call(settings);
-    if (route != null) return route;
-    _onError?.call(
-      OctopusUnknownRouteException(settings),
-      StackTrace.current,
-    );
-    return null;
-  }
-
-  List<Page<Object?>> _buildPages(BuildContext context) {
-    final state = _currentConfiguration;
-    Iterable<Page<Object?>> pageGenerator() sync* {
-      if (state == null || state is InvalidOctopusState) return;
-      for (final node in state) {
-        yield node.route.buildPage(context, node.arguments);
-      }
-    }
-
-    final pages = pageGenerator().toList();
-    if (pages.isNotEmpty) return pages;
-
-    const errorMessage = 'The Navigator.pages must not be empty to use the '
-        'Navigator.pages API';
-    final error = FlutterError(errorMessage);
-    _onError?.call(
-      error,
-      StackTrace.current,
-    );
-    return <Page<Object?>>[
-      MaterialPage(
-        child: Scaffold(
-          body: SafeArea(
-            child: ErrorWidget.withDetails(
-              message: errorMessage,
-              error: error,
-            ),
-          ),
-        ),
-        arguments: <String, Object?>{
-          'message': errorMessage,
-          'error': error,
+  bool _onPopPage(Route<Object?> route, Object? result) => _handleErrors(
+        () {
+          if (!route.didPop(result)) return false;
+          final popped = value.maybePop();
+          if (popped == null) return false;
+          setNewRoutePath(popped);
+          return true;
         },
-      )
-    ];
+        (_, __) => false,
+      );
+
+  Route<Object?>? _onUnknownRoute(RouteSettings settings) => _handleErrors(
+        () {
+          final route = _notFound?.call(settings);
+          if (route != null) return route;
+          _onError?.call(
+            OctopusUnknownRouteException(settings),
+            StackTrace.current,
+          );
+          return null;
+        },
+        (_, __) => null,
+      );
+
+  List<Page<Object?>> _buildPages(BuildContext context) => _handleErrors(() {
+        final state = value;
+        Iterable<Page<Object?>> pageGenerator() sync* {
+          if (state is InvalidOctopusState) return;
+          for (final node in state) {
+            yield node.route.buildPage(context, node.arguments);
+          }
+        }
+
+        final pages = pageGenerator().toList();
+        if (pages.isNotEmpty) return pages;
+        throw FlutterError('The Navigator.pages must not be empty to use the '
+            'Navigator.pages API');
+      }, (_, stackTrace) {
+        const errorMessage = 'The Navigator.pages must not be empty to use the '
+            'Navigator.pages API';
+        final error = FlutterError(errorMessage);
+        return <Page<Object?>>[
+          MaterialPage(
+            child: Scaffold(
+              body: SafeArea(
+                child: ErrorWidget.withDetails(
+                  message: errorMessage,
+                  error: error,
+                ),
+              ),
+            ),
+            arguments: <String, Object?>{
+              'message': errorMessage,
+              'error': Error.safeToString(error),
+              'stack': stackTrace.toString(),
+            },
+          )
+        ];
+      });
+
+  T _handleErrors<T>(
+    T Function() callback, [
+    T Function(Object error, StackTrace stackTrace)? fallback,
+  ]) {
+    try {
+      return callback();
+    } on Object catch (e, s) {
+      _onError?.call(e, s);
+      if (fallback == null) rethrow;
+      return fallback(e, s);
+    }
+  }
+}
+
+mixin _OctopusStateObserver
+    on RouterDelegate<OctopusState>, ChangeNotifier
+    implements ValueListenable<OctopusState> {
+  @protected
+  @nonVirtual
+  OctopusState? _value;
+
+  @override
+  OctopusState get value =>
+      _value ?? (throw UnsupportedError('Initial configuration not set'));
+
+  @protected
+  @nonVirtual
+  void changeState(OctopusState? state) {
+    if (state == null) return;
+    _value = state;
+    notifyListeners();
   }
 }
