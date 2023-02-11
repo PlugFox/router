@@ -2,11 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:octopus/src/state/octopus_node.dart';
 
 import '../parser/information_parser.dart';
 import '../provider/information_provider.dart';
 import '../route/octopus_route.dart';
+import '../state/octopus_node.dart';
 import '../state/octopus_state.dart';
 import 'octopus_delegate.dart';
 import 'octopus_singleton.dart';

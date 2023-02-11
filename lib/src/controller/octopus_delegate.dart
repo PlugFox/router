@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:octopus/src/widget/octopus_navigator.dart';
 
 import '../error/error.dart';
 import '../state/octopus_state.dart';
+import '../widget/octopus_navigator.dart';
 import 'octopus.dart';
 
 /// Octopus delegate.

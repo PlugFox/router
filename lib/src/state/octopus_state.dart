@@ -1,9 +1,9 @@
 import 'dart:collection';
 
 import 'package:meta/meta.dart';
-import 'package:octopus/src/route/octopus_route.dart';
 
 import '../error/error.dart';
+import '../route/octopus_route.dart';
 import 'octopus_node.dart';
 
 /// {@template octopus_state}

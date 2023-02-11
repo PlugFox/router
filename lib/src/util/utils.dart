@@ -1,4 +1,3 @@
-
 import 'package:meta/meta.dart';
 
 /// {@nodoc}
@@ -7,9 +6,17 @@ import 'package:meta/meta.dart';
 abstract class Utils {
   Utils._();
 
+  static final Map<String, String> _$name2key = <String, String>{};
+
   /// Replace all non-alphanumeric characters with underscores
   @experimental
   static String name2key(String name) {
+    {
+      // Check cache first to avoid unnecessary string operations
+      final cache = _$name2key[name];
+      if (cache != null) return cache;
+    }
+
     final codeUnits = name.codeUnits.toList();
     final length = codeUnits.length;
 
@@ -30,16 +37,20 @@ abstract class Utils {
       } else if (codeUnit > 64 && codeUnit < 91) {
         // A..Z: 65..90
         writeNext(codeUnit + 32); // Convert to lowercase
-      } else if (j == 0 || codeUnits[j - 1] != 95) {
+      } else if (j == 0 || codeUnits[j - 1] == 45) {
         continue; // Current character is already '-'
       } else {
         writeNext(45); // Replace all other characters with '-'
       }
     }
-    // Remove trailing underscore
-    if (j < length && codeUnits[j] == 95) j--;
-    if (j == 0) return '';
 
-    return String.fromCharCodes(codeUnits.take(j));
+    {
+      // Remove trailing underscore
+      if (j > 0 && codeUnits[j - 1] == 45) j--;
+      // Return empty string if name is empty
+      if (j < 1) return _$name2key[name] = '';
+    }
+
+    return _$name2key[name] = String.fromCharCodes(codeUnits.take(j));
   }
 }

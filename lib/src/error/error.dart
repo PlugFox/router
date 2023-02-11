@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart' show RouteSettings;
 import 'package:meta/meta.dart';
 
+import '../state/octopus_state.dart';
+
 /// Error handling for Octopus router.
 typedef OctopusErrorCallback = void Function(
   OctopusException exception,
@@ -39,36 +41,48 @@ class OctopusUnknownRouteException extends OctopusException {
   String toString() => message;
 }
 
-/// {@template error_invalid_route_information_location}
-/// Invalid route information location
+/// {@template error_encode_exception}
+/// Route information location encoding exception.
 /// {@endtemplate}
-class OctopusInvalidRouteInformationLocation extends OctopusException {
-  /// {@macro error_invalid_route_information_location}
-  OctopusInvalidRouteInformationLocation(this.location);
+class OctopusEncodeException extends OctopusException {
+  /// {@macro error_encode_exception}
+  OctopusEncodeException({
+    required this.exception,
+    this.location,
+  });
 
-  /// The invalid route information location.
+  /// Route information location.
   final String? location;
 
+  /// The exception.
+  final Object exception;
+
   @override
-  String get message => 'Invalid route information location: '
-      '${location ?? 'null'}';
+  String get message => 'Location${location != null ? ' "$location"' : ''} '
+      'encoding exception: $exception';
 
   @override
   String toString() => message;
 }
 
-/// {@template error_invalid_route_information_state}
-/// Invalid route information state
+/// {@template error_decode_exception}
+/// Route information state decoding exception.
 /// {@endtemplate}
-class OctopusInvalidRouteInformationState extends OctopusException {
-  /// {@macro error_invalid_route_information_state}
-  OctopusInvalidRouteInformationState(this.state);
+class OctopusDecodeException extends OctopusException {
+  /// {@macro error_decode_exception}
+  OctopusDecodeException({
+    required this.exception,
+    required this.state,
+  });
 
-  /// The invalid route information state.
-  final Object? state;
+  /// The exception.
+  final Object exception;
+
+  /// Invalid router state.
+  final OctopusState state;
 
   @override
-  String get message => 'Invalid route information state';
+  String get message => 'State encoding exception: $exception';
 
   @override
   String toString() => message;
@@ -89,18 +103,4 @@ class OctopusStateValidationException extends OctopusException {
 
   @override
   String toString() => message;
-}
-
-/// {@template error_unknown_exception}
-/// Octopus router unknown exception.
-/// {@endtemplate}
-class OctopusRouterUnknownException extends OctopusException {
-  /// {@macro error_unknown_exception}
-  OctopusRouterUnknownException(this.exception);
-
-  /// The unknown exception.
-  final Object exception;
-
-  @override
-  String get message => exception.toString();
 }

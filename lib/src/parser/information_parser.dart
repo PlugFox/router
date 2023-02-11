@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:octopus/src/state/octopus_state.dart';
 
 import '../../octopus.dart';
 import '../error/error.dart';
-import '../util/utils.dart';
+import '../state/octopus_state.dart';
+import 'state_codec.dart';
 
 /// Converts between [RouteInformation] and [OctopusState].
 /// {@nodoc}
@@ -16,14 +15,9 @@ import '../util/utils.dart';
 class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   /// {@nodoc}
   OctopusInformationParser({required List<OctopusRoute> routes})
-      : _routes = UnmodifiableMapView<String, OctopusRoute>(
-          <String, OctopusRoute>{
-            '/': routes.first,
-            for (final route in routes) Utils.name2key(route.name): route,
-          },
-        );
+      : _codec = OctopusStateCodec(routes);
 
-  final UnmodifiableMapView<String, OctopusRoute> _routes;
+  final OctopusStateCodec _codec;
 
   @override
   Future<OctopusState> parseRouteInformationWithDependencies(
@@ -32,6 +26,27 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   ) =>
       parseRouteInformation(routeInformation);
 
+  @override
+  Future<OctopusState> parseRouteInformation(RouteInformation route) {
+    try {
+      return SynchronousFuture<OctopusState>(_codec.encode(route));
+    } on Object catch (error, stackTrace) {
+      return SynchronousFuture<OctopusState>(
+        InvalidOctopusState(
+          OctopusEncodeException(exception: error, location: route.location),
+          stackTrace,
+        ),
+      );
+    }
+  }
+
+  @override
+  RouteInformation? restoreRouteInformation(OctopusState state) {
+    // TODO: implement restoreRouteInformation
+    throw UnimplementedError();
+  }
+
+/*
   @override
   Future<OctopusState> parseRouteInformation(
     RouteInformation routeInformation,
@@ -189,5 +204,5 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
     Map<String, String> arguments = const <String, String>{},
     OctopusNode<OctopusRoute>? prev,
   }) =>
-      OctopusNode.page(route: route, arguments: arguments);
+      OctopusNode.page(route: route, arguments: arguments); */
 }

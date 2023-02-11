@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import '../util/utils.dart';
+
 /// Base class for all routes.
 @immutable
 abstract class OctopusRoute {
@@ -7,6 +9,9 @@ abstract class OctopusRoute {
 
   /// Name of the route.
   final String name;
+
+  /// Key of the route.
+  String get key => Utils.name2key(name);
 
   /// Build [Page] for this route.
   Page<Object?> buildPage(BuildContext context, Map<String, String> arguments);

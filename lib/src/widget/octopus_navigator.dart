@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:octopus/src/controller/octopus_singleton.dart';
 
 import '../controller/octopus.dart';
+import '../controller/octopus_singleton.dart';
 import '../state/octopus_state.dart';
 
 /// {@nodoc}
