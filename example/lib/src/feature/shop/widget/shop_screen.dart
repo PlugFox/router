@@ -12,9 +12,12 @@ class ShopScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Shop'),
         ),
-        body: const SafeArea(
+        body: SafeArea(
           child: Center(
-            child: Text('Shop'),
+            child: ElevatedButton(
+              onPressed: () {},
+              child: const Text('Shop'),
+            ),
           ),
         ),
       );

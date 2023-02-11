@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
 import '../error/error.dart';
 import '../state/octopus_state.dart';
 import '../widget/inherited_octopus.dart';
+import 'octopus.dart';
 
 /// Octopus delegate.
 class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
@@ -35,6 +37,12 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
 
   /// Error handler.
   final void Function(Object error, StackTrace stackTrace)? _onError;
+
+  /// Current octopus instance.
+  late Octopus _controller;
+
+  @internal
+  set $controller(Octopus controller) => _controller = controller;
 
   /// Current configuration.
   OctopusState? _currentConfiguration;
@@ -104,6 +112,8 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
 
   @override
   Widget build(BuildContext context) => InheritedOctopus(
+        controller: _controller,
+        state: currentConfiguration,
         child: Builder(
           builder: (context) => Navigator(
             restorationScopeId: _restorationScopeId,

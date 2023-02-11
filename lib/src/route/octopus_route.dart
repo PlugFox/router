@@ -17,6 +17,8 @@ abstract class OctopusRoute {
 mixin OctopusRouteOwner {
   /// Route of this owner.
   OctopusRoute get route;
+
+  //OctopusNode call()
 }
 
 /// {@template octopus_route_page}
@@ -30,14 +32,19 @@ abstract class OctopusRoute$Page extends OctopusRoute {
   //Page<void> buildPage(BuildContext context, Map<String, String> arguments);
 }
 
-/* abstract class OctopusRoute$Tabs extends OctopusRoute {
+/*
+/// Tabs route.
+abstract class OctopusRoute$Tabs extends OctopusRoute {
   const OctopusRoute$Tabs(String name) : super._(name);
 
   Page<void> buildPage(BuildContext context, Map<String, String> arguments);
 } */
 
-/* abstract class OctopusRoute$Navigator extends OctopusRoute {
+/*
+/// Nested navigation route
+abstract class OctopusRoute$Navigator extends OctopusRoute {
   const OctopusRoute$Navigator(String name) : super._(name);
 
-  /* Page<void> buildPage(BuildContext context, Map<String, String> arguments); */
-} */
+  Page<void> buildPage(BuildContext context, Map<String, String> arguments);
+}
+*/
