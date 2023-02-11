@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:octopus/octopus.dart';
 
 /// {@template shop_screen}
 /// ShopScreen widget.
@@ -15,7 +16,7 @@ class ShopScreen extends StatelessWidget {
         body: SafeArea(
           child: Center(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () => Octopus.instance.navigate('/shop/category'),
               child: const Text('Shop'),
             ),
           ),

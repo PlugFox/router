@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:octopus/src/widget/octopus_navigator.dart';
 
 import '../error/error.dart';
 import '../state/octopus_state.dart';
-import '../widget/inherited_octopus.dart';
 import 'octopus.dart';
 
 /// Octopus delegate.
@@ -111,23 +111,18 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
   }
 
   @override
-  Widget build(BuildContext context) => InheritedOctopus(
+  Widget build(BuildContext context) => OctopusNavigator(
         controller: _controller,
-        state: currentConfiguration,
-        child: Builder(
-          builder: (context) => Navigator(
-            restorationScopeId: _restorationScopeId,
-            reportsRouteUpdateToEngine: true,
-            observers: <NavigatorObserver>[
-              _modalObserver,
-              ...?_observers,
-            ],
-            transitionDelegate: _transitionDelegate,
-            pages: _buildPage(context),
-            onPopPage: _onPopPage,
-            onUnknownRoute: _onUnknownRoute,
-          ),
-        ),
+        restorationScopeId: _restorationScopeId,
+        reportsRouteUpdateToEngine: true,
+        observers: <NavigatorObserver>[
+          _modalObserver,
+          ...?_observers,
+        ],
+        transitionDelegate: _transitionDelegate,
+        pages: _buildPages(context),
+        onPopPage: _onPopPage,
+        onUnknownRoute: _onUnknownRoute,
       );
 
   bool _onPopPage(Route<Object?> route, Object? result) {
@@ -148,7 +143,7 @@ class OctopusDelegate extends RouterDelegate<OctopusState> with ChangeNotifier {
     return null;
   }
 
-  List<Page<Object?>> _buildPage(BuildContext context) {
+  List<Page<Object?>> _buildPages(BuildContext context) {
     final state = _currentConfiguration;
     Iterable<Page<Object?>> pageGenerator() sync* {
       if (state == null || state is InvalidOctopusState) return;
