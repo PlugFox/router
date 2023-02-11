@@ -72,6 +72,7 @@ class OctopusImpl extends Octopus
     RouteFactory? notFound,
     void Function(Object error, StackTrace stackTrace)? onError,
   }) {
+    // TODO(plugfox): validate routes names uniqueness.
     final list = routes.map<OctopusRoute>((e) => e.route).toList();
     if (list.isEmpty) {
       final error = StateError('Routes list should contain at least one route');

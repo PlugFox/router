@@ -6,6 +6,7 @@ import 'package:octopus/octopus.dart';
 
 import '../localization/localization.dart';
 import '../router/routes.dart';
+import '../util/logging.dart';
 import 'octopus_state_observer.dart';
 
 /// {@template app}
@@ -20,8 +21,10 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final RouterConfig<Object> routerConfig =
-      Octopus(routes: Routes.values).config;
+  final RouterConfig<Object> routerConfig = Octopus(
+    routes: Routes.values,
+    onError: severe,
+  ).config;
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(

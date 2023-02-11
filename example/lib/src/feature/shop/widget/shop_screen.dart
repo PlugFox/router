@@ -17,7 +17,7 @@ class ShopScreen extends StatelessWidget {
           child: Center(
             child: ElevatedButton(
               onPressed: () => Octopus.instance.navigate('/shop/category'),
-              child: const Text('Shop'),
+              child: const Text('Go to category'),
             ),
           ),
         ),

@@ -8,6 +8,7 @@ import 'package:octopus/src/state/octopus_state.dart';
 
 import '../../octopus.dart';
 import '../error/error.dart';
+import '../util/utils.dart';
 
 /// Converts between [RouteInformation] and [OctopusState].
 /// {@nodoc}
@@ -18,7 +19,7 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
       : _routes = UnmodifiableMapView<String, OctopusRoute>(
           <String, OctopusRoute>{
             '/': routes.first,
-            for (final route in routes) route.name: route,
+            for (final route in routes) Utils.name2key(route.name): route,
           },
         );
 
@@ -98,8 +99,9 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
   ) {
     if (nodes.isEmpty) return Uri(path: '/');
     String encodeNode(String name, Map<String, String?> arguments) {
-      if (arguments.isEmpty) return name;
-      final buffer = StringBuffer(name)..write('@');
+      final key = Utils.name2key(name);
+      if (arguments.isEmpty) return key;
+      final buffer = StringBuffer(key)..write('@');
       final entries = arguments.entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key));
       for (final entry in entries) {
@@ -148,7 +150,8 @@ class OctopusInformationParser implements RouteInformationParser<OctopusState> {
     for (var i = segments.length - 1; i != 0; --i) {
       final segment = segments[i];
       final index = segment.indexOf('@');
-      final name = index == -1 ? segment : segment.substring(0, index);
+      final name =
+          Utils.name2key(index == -1 ? segment : segment.substring(0, index));
       final route = routes[name];
       if (route is! OctopusRoute) {
         assert(false, 'Invalid route name');

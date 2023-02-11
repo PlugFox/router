@@ -25,7 +25,7 @@ abstract class OctopusException implements Exception {
 /// Unknown routes can arise either from errors in the app or from external
 /// requests to push routes, such as from Android intents.
 /// {@endtemplate}
-class OctopusUnknownRouteException implements OctopusException {
+class OctopusUnknownRouteException extends OctopusException {
   /// {@macro error_unknown_route}
   OctopusUnknownRouteException(this.routeSettings);
 
@@ -42,7 +42,7 @@ class OctopusUnknownRouteException implements OctopusException {
 /// {@template error_invalid_route_information_location}
 /// Invalid route information location
 /// {@endtemplate}
-class OctopusInvalidRouteInformationLocation implements OctopusException {
+class OctopusInvalidRouteInformationLocation extends OctopusException {
   /// {@macro error_invalid_route_information_location}
   OctopusInvalidRouteInformationLocation(this.location);
 
@@ -60,7 +60,7 @@ class OctopusInvalidRouteInformationLocation implements OctopusException {
 /// {@template error_invalid_route_information_state}
 /// Invalid route information state
 /// {@endtemplate}
-class OctopusInvalidRouteInformationState implements OctopusException {
+class OctopusInvalidRouteInformationState extends OctopusException {
   /// {@macro error_invalid_route_information_state}
   OctopusInvalidRouteInformationState(this.state);
 
@@ -77,7 +77,7 @@ class OctopusInvalidRouteInformationState implements OctopusException {
 /// {@template error_invalid_route_information_state}
 /// Invalid route information state
 /// {@endtemplate}
-class OctopusStateValidationException implements OctopusException {
+class OctopusStateValidationException extends OctopusException {
   /// {@macro error_invalid_route_information_state}
   OctopusStateValidationException(this.path, this.message);
 
@@ -94,7 +94,7 @@ class OctopusStateValidationException implements OctopusException {
 /// {@template error_unknown_exception}
 /// Octopus router unknown exception.
 /// {@endtemplate}
-class OctopusRouterUnknownException implements OctopusException {
+class OctopusRouterUnknownException extends OctopusException {
   /// {@macro error_unknown_exception}
   OctopusRouterUnknownException(this.exception);
 
