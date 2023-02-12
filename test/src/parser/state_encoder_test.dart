@@ -17,19 +17,19 @@ void main() => group('StateEncoder', () {
 
       test('routeFromSegment', () {
         expect(
-          () => encoder.routeFromSegment('shop'),
+          () => encoder.nodeFromSegment('shop'),
           returnsNormally,
         );
         expect(
-          encoder.routeFromSegment('unknown-route'),
+          encoder.nodeFromSegment('unknown-route'),
           isNull,
         );
         expect(
-          encoder.routeFromSegment('shop'),
+          encoder.nodeFromSegment('shop'),
           isNotNull,
         );
         expect(
-          encoder.routeFromSegment('category--id(electronic)'),
+          encoder.nodeFromSegment('category--id(electronic)'),
           allOf(
             isA<OctopusNode>().having(
               (s) => s.route,
@@ -53,7 +53,7 @@ void main() => group('StateEncoder', () {
           ),
         );
         expect(
-          encoder.routeFromSegment(
+          encoder.nodeFromSegment(
             'Gift-Vouchers'
             '--title(Mobile phone)'
             '--Tag Color (TagColor%28+%237CFC00+%29)'
@@ -124,54 +124,15 @@ void main() => group('StateEncoder', () {
           returnsNormally,
         );
         expect(
-          () => encoder.nodesFromUri(Uri.parse('/')),
+          () => encoder.nodesFromUri(Uri.parse('/').pathSegments),
           returnsNormally,
         );
         expect(
-          () => encoder.nodesFromUri(uri),
+          () => encoder.nodesFromUri(uri?.pathSegments),
           returnsNormally,
         );
         expect(
-          encoder.nodesFromUri(uri),
-          isA<List<OctopusNode>>().having(
-            (s) => s,
-            'list',
-            allOf(
-              isNotEmpty,
-              hasLength(5),
-              everyElement(
-                isA<OctopusNode>().having(
-                  (s) => s.route,
-                  'route',
-                  isNotNull,
-                ),
-              ),
-            ),
-          ),
-        );
-      });
-
-      test('nodesFromUri', () {
-        final uri = Uri.tryParse('/shop'
-            '/Gift-Vouchers--Order_By(price)--(true)'
-            '/Unknown-route--k(v)'
-            '/Category--ID(electronic)'
-            '/Category--id(smartphone)'
-            '/product--type(Mobile phone)--id(5)--degree-of-protection(IP68)');
-        expect(
-          () => encoder.nodesFromUri(null),
-          returnsNormally,
-        );
-        expect(
-          () => encoder.nodesFromUri(Uri.parse('/')),
-          returnsNormally,
-        );
-        expect(
-          () => encoder.nodesFromUri(uri),
-          returnsNormally,
-        );
-        expect(
-          encoder.nodesFromUri(uri),
+          encoder.nodesFromUri(uri?.pathSegments),
           isA<List<OctopusNode>>().having(
             (s) => s,
             'list',

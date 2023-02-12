@@ -30,7 +30,7 @@ class OctopusStateEncoder extends Converter<RouteInformation, OctopusState> {
         ? input.state! as Map<String, Object?>
         : <String, Object?>{}; */
     assert(uri != null, 'Invalid route information location');
-    final nodes = nodesFromUri(uri);
+    final nodes = nodesFromUri(uri?.pathSegments);
     assert(nodes.isNotEmpty, 'Empty nodes');
     return OctopusState(
       current: nodes.last,
@@ -38,12 +38,11 @@ class OctopusStateEncoder extends Converter<RouteInformation, OctopusState> {
     );
   }
 
-  /// Returns the nodes from the given [Uri].
+  /// Returns the [OctopusNode]s from the given [Uri].
   @visibleForTesting
-  List<OctopusNode<OctopusRoute>> nodesFromUri(Uri? uri) {
-    final segments = uri?.pathSegments ?? <String>[];
-    final nodes = segments
-        .map<OctopusNode<OctopusRoute>?>(routeFromSegment)
+  List<OctopusNode<OctopusRoute>> nodesFromUri(List<String>? segments) {
+    final nodes = (segments ?? <String>[])
+        .map<OctopusNode<OctopusRoute>?>(nodeFromSegment)
         .whereType<OctopusNode<OctopusRoute>>()
         .toList();
     if (nodes.isNotEmpty) return nodes;
@@ -54,12 +53,13 @@ class OctopusStateEncoder extends Converter<RouteInformation, OctopusState> {
     return <OctopusNode<OctopusRoute>>[root];
   }
 
-  /// Returns the route from the given segment.
+  /// Returns the node from the given segment.
+  /// Examples:
   /// shop
   /// category--id(electronic)
   /// mobile-phone--id(5)--degree-of-protection(IP68)
   @visibleForTesting
-  OctopusNode<OctopusRoute>? routeFromSegment(String segment) {
+  OctopusNode<OctopusRoute>? nodeFromSegment(String segment) {
     final index = segment.indexOf('--');
     final name = Utils.name2key(
       index == -1 ? segment : segment.substring(0, index),

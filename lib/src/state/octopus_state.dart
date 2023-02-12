@@ -159,7 +159,8 @@ class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
   final StackTrace stackTrace;
 
   @override
-  List<OctopusNode<OctopusRoute>> get _nodes => throw UnimplementedError();
+  List<OctopusNode<OctopusRoute>> get _nodes =>
+      const <OctopusNode<OctopusRoute>>[];
 
   @override
   OctopusState copyWith(
@@ -187,7 +188,7 @@ class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
       );
 
   @override
-  void visitChildNodes(NodeVisitor visitor) => throw UnimplementedError();
+  void visitChildNodes(NodeVisitor visitor) {}
 
   @override
   String toString() => error.toString();
