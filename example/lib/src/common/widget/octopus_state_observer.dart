@@ -81,8 +81,7 @@ class __OctopusStateObserver$ButtonState
                       .findAncestorWidgetOfExactType<OctopusStateObserver>()!
                       .observer,
                   builder: (context, state, _) => Text(
-                    state.toString(),
-                    maxLines: 1,
+                    state.toStringDeep(),
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       height: 1,

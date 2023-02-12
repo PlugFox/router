@@ -121,7 +121,7 @@ void main() => group('StateEncoder', () {
       });
 
       test('convert', () {
-        final state = OctopusState(current: nodes.last, nodes: nodes);
+        final state = OctopusState(current: nodes.last, children: nodes);
         expect(
           () => encoder.convert(OctopusState.single(nodes.first)),
           returnsNormally,

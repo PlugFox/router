@@ -151,7 +151,7 @@ class OctopusDelegate extends RouterDelegate<OctopusState>
         Iterable<Page<Object?>> pageGenerator() sync* {
           if (state is InvalidOctopusState) return;
           // TODO(plugfox): tree shaking
-          for (final node in state) {
+          for (final node in state.children) {
             yield node.route.buildPage(context, node.arguments);
           }
         }

@@ -34,7 +34,7 @@ class OctopusStateEncoder extends Converter<RouteInformation, OctopusState> {
     assert(nodes.isNotEmpty, 'Empty nodes');
     return OctopusState(
       current: nodes.last,
-      nodes: nodes,
+      children: nodes,
     );
   }
 

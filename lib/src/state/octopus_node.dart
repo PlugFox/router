@@ -35,10 +35,12 @@ abstract class OctopusNode<T extends OctopusRoute> {
   /// Convert this node to JSON.
   Map<String, Object?> toJson();
 
+  /*
   /// Pattern matching.
   R map<R>({
     required R Function(OctopusNode$Page node) page,
   });
+ */
 
   /// Walks the children of this node.
   void visitChildNodes(NodeVisitor visitor);
@@ -62,11 +64,12 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
   @override
   final Map<String, String> arguments;
 
+  /*
   @override
   map<R>({
     required R Function(OctopusNode$Page<OctopusRoute> node) page,
   }) =>
-      page(this);
+      page(this); */
 
   @override
   Map<String, Object?> toJson() => <String, Object?>{

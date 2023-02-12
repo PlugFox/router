@@ -31,7 +31,7 @@ void main() => group('InformationParser', () {
           parseRouteInformation(location),
           completion(
             isA<OctopusState>().having(
-              (s) => s.first.route,
+              (s) => s.children.first.route,
               'route',
               anyOf(
                 isA<OctopusRoute>(),

@@ -144,4 +144,11 @@ mixin _OctopusNavigationMixin on _OctopusDelegateOwner, Octopus {
       ?.parseRouteInformation(RouteInformation(location: location))
       .then<void>(stateObserver.setNewRoutePath)
       .ignore();
+
+  /// Push to the active navigation stack.
+  /// PushTo
+  /// Pop
+  /// PopFrom
+  /// Activate
+  /// Replace
 }

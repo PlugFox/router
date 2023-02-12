@@ -193,7 +193,7 @@ void main() => group('StateEncoder', () {
           allOf(
             isNotEmpty,
             isA<OctopusState>().having(
-              (s) => s.first.route,
+              (s) => s.children.first.route,
               'route',
               FakeRoutes.values.first.route,
             ),

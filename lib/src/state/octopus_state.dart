@@ -10,33 +10,35 @@ import 'octopus_node.dart';
 /// Router whole application state
 /// {@endtemplate}
 @immutable
-abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
+abstract class OctopusState {
+  /// {@nodoc}
+  const OctopusState._();
+
   /// {@macro octopus_state}
   factory OctopusState({
     required OctopusNode<OctopusRoute> current,
-    required Iterable<OctopusNode<OctopusRoute>> nodes,
+    required Iterable<OctopusNode<OctopusRoute>> children,
   }) =>
       OctopusStateImpl(
         current: current,
-        nodes: nodes,
+        children: children,
       );
 
   /// {@macro octopus_state}
   factory OctopusState.single(OctopusNode<OctopusRoute> node) => OctopusState(
         current: node,
-        nodes: <OctopusNode<OctopusRoute>>[node],
+        children: <OctopusNode<OctopusRoute>>[node],
       );
 
   /// Current active/visible node
   abstract final OctopusNode<OctopusRoute> current;
 
+  /// Children of this state
+  abstract final List<OctopusNode<OctopusRoute>> children;
+
   /// Active routing path of the application
   /// e.g. /shop/category@id=1/category@id=24/brand&name=Apple/product@id=123&color=green
   List<OctopusNode<OctopusRoute>> get location;
-
-  /// Returns the element at the given [index] in the list
-  ///  or throws an [RangeError]
-  OctopusNode<OctopusRoute> operator [](int index);
 
   /// Try to pop the current node and return new, previus state
   OctopusState? maybePop();
@@ -44,7 +46,7 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   /// Copy this state with new values
   OctopusState copyWith({
     OctopusNode<OctopusRoute>? newCurrent,
-    List<OctopusNode<OctopusRoute>>? newNodes,
+    List<OctopusNode<OctopusRoute>>? newChildren,
   });
 
   /// Convert this state to JSON.
@@ -56,6 +58,12 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   /// Walks the children of this node.
   void visitChildNodes(NodeVisitor visitor);
 
+  /// Returns a one-line detailed description of the object.
+  /// e.g.:
+  /// Router {current: Tabs, children: 3}
+  String toStringShallow();
+
+  /// Returns a string representation of this node and its descendants.
   /// e.g.:
   /// Router
   /// ├── Tabs
@@ -70,47 +78,64 @@ abstract class OctopusState implements Iterable<OctopusNode<OctopusRoute>> {
   /// │       └── Settings
   /// ├── Gallery
   /// └── Camera
+  String toStringDeep();
+
+  /// A short, textual description of this element.
+  /// e.g.:
+  /// OctopusState(current: A, children: 3)
+  String toStringShort();
+
   @override
   String toString();
 }
 
 /// {@nodoc}
 @internal
-class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
-    with _OctopusNodeImmutableListMixin
-    implements OctopusState {
+class OctopusStateImpl extends OctopusState {
   /// {@nodoc}
   OctopusStateImpl({
-    required OctopusNode<OctopusRoute> current,
-    required Iterable<OctopusNode<OctopusRoute>> nodes,
-  })  : _current = current,
-        _location = UnmodifiableListView<OctopusNode<OctopusRoute>>([current]),
-        _nodes = UnmodifiableListView<OctopusNode<OctopusRoute>>(nodes);
+    // TODO(plugfox): Replace with factory and children based on current
+    required this.current,
+    required Iterable<OctopusNode<OctopusRoute>> children,
+  })  : children = children is UnmodifiableListView<OctopusNode<OctopusRoute>>
+            ? children
+            : UnmodifiableListView<OctopusNode<OctopusRoute>>(children),
+        super._();
 
   @override
-  OctopusNode<OctopusRoute> get current => _current;
-  final OctopusNode<OctopusRoute> _current;
+  final OctopusNode<OctopusRoute> current;
 
   @override
-  List<OctopusNode<OctopusRoute>> get location => _location;
-  final List<OctopusNode<OctopusRoute>> _location;
-  @override
-  final List<OctopusNode<OctopusRoute>> _nodes;
+  List<OctopusNode<OctopusRoute>> get location => children;
 
   @override
-  OctopusState? maybePop() => throw UnimplementedError();
+  final List<OctopusNode<OctopusRoute>> children;
 
+  // TODO(plugfox): implement OctopusState.maybePop()
+  @override
+  OctopusState? maybePop() => children.length == 1
+      ? null
+      : copyWith(
+          newCurrent: children[children.length - 2],
+          newChildren: children.sublist(0, children.length - 1),
+        );
+
+  // TODO(plugfox): implement OctopusState.copyWith()
   @override
   OctopusState copyWith({
     OctopusNode<OctopusRoute>? newCurrent,
-    List<OctopusNode<OctopusRoute>>? newNodes,
+    List<OctopusNode<OctopusRoute>>? newChildren,
   }) =>
-      throw UnimplementedError();
+      OctopusStateImpl(
+        current: newCurrent ?? current,
+        children: newChildren ?? children,
+      );
 
   @override
   Map<String, Object?> toJson() => <String, Object?>{
         'current': current.toJson(),
-        'nodes': map<Map<String, Object?>>((e) => e.toJson()).toList(),
+        'children':
+            children.map<Map<String, Object?>>((e) => e.toJson()).toList(),
       };
 
   // TODO(plugfox): implement validation
@@ -118,39 +143,55 @@ class OctopusStateImpl extends IterableBase<OctopusNode<OctopusRoute>>
   OctopusStateValidationException? validate() => null;
 
   @override
-  void visitChildNodes(NodeVisitor visitor) => _nodes.forEach(visitor);
-
-  // TODO(plugfox): OctopusState.toString()
-  @override
-  String toString() => 'OctopusState()';
-}
-
-mixin _OctopusNodeImmutableListMixin on IterableBase<OctopusNode<OctopusRoute>>
-    implements OctopusState {
-  abstract final List<OctopusNode<OctopusRoute>> _nodes;
+  void visitChildNodes(NodeVisitor visitor) => children.forEach(visitor);
 
   @override
-  int get length => _nodes.length;
+  String toStringDeep() {
+    final buffer = StringBuffer();
+    buffer.writeln('Root');
+    var depth = 0;
+    void addNode(OctopusNode<OctopusRoute> node, int depth) {
+      buffer
+        ..write('  ' * depth)
+        ..write('├── ')
+        ..write(node.route.name);
+      if (node.arguments.isNotEmpty) {
+        buffer
+          ..write('(')
+          ..write(node.arguments.entries
+              .map<String>((e) => '${e.key}: ${e.value}')
+              .join(', '))
+          ..write(')');
+      }
+      buffer.writeln();
+    }
+
+    visitChildNodes((node) {
+      depth = 0;
+      addNode(node, depth);
+    });
+
+    return buffer.toString();
+  }
 
   @override
-  OctopusNode<OctopusRoute> get last => _nodes.last;
+  String toStringShallow() => '/${location.map((e) => e.route.key).join('/')}';
 
   @override
-  Iterator<OctopusNode<OctopusRoute>> get iterator => _nodes.iterator;
+  String toStringShort() =>
+      'OctopusState(current: $current, children: ${children.length})';
 
   @override
-  OctopusNode<OctopusRoute> operator [](int index) => _nodes.elementAt(index);
+  String toString() => toStringShallow();
 }
 
 /// Invalid state, when something went wrong.
 /// Usually it's a result of a bug in the application
 /// or [OctopusInformationParser.parseRouteInformation].
 @internal
-class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
-    with _OctopusNodeImmutableListMixin
-    implements OctopusState {
+class InvalidOctopusState extends OctopusState {
   /// Invalid state
-  const InvalidOctopusState(this.error, this.stackTrace);
+  const InvalidOctopusState(this.error, this.stackTrace) : super._();
 
   /// Error
   final OctopusException error;
@@ -159,13 +200,14 @@ class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
   final StackTrace stackTrace;
 
   @override
-  List<OctopusNode<OctopusRoute>> get _nodes =>
+  List<OctopusNode<OctopusRoute>> get children =>
       const <OctopusNode<OctopusRoute>>[];
 
   @override
-  OctopusState copyWith(
-          {OctopusNode<OctopusRoute>? newCurrent,
-          List<OctopusNode<OctopusRoute>>? newNodes}) =>
+  OctopusState copyWith({
+    OctopusNode<OctopusRoute>? newCurrent,
+    List<OctopusNode<OctopusRoute>>? newChildren,
+  }) =>
       InvalidOctopusState(error, stackTrace);
 
   @override
@@ -191,5 +233,14 @@ class InvalidOctopusState extends IterableBase<OctopusNode<OctopusRoute>>
   void visitChildNodes(NodeVisitor visitor) {}
 
   @override
-  String toString() => error.toString();
+  String toStringDeep() => error.toString();
+
+  @override
+  String toStringShallow() => error.toString();
+
+  @override
+  String toStringShort() => 'InvalidOctopusState()';
+
+  @override
+  String toString() => toStringShort();
 }

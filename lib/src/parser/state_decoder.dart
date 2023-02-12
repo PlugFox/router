@@ -16,7 +16,9 @@ class OctopusStateDecoder extends Converter<OctopusState, RouteInformation> {
   RouteInformation convert(covariant OctopusState input) {
     // TODO(plugfox): Use state to restore the tree of nodes.
     return RouteInformation(
-      location: input.isEmpty ? null : uriFromNodes(input.toList())?.join('/'),
+      location: input.children.isEmpty
+          ? null
+          : uriFromNodes(input.children.toList())?.join('/'),
       // state: <String, Object?>{},
     );
   }
