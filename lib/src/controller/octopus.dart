@@ -88,7 +88,7 @@ class OctopusImpl extends Octopus
       routes: list,
     );
     final routerDelegate = OctopusDelegate(
-      initialState: OctopusState.single(OctopusNode.page(route: firstPage)),
+      initialState: OctopusState.single(OctopusNode.page(firstPage)),
       restorationScopeId: restorationScopeId,
       observers: observers,
       transitionDelegate: transitionDelegate,

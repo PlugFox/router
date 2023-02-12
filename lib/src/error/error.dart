@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart' show RouteSettings;
 import 'package:meta/meta.dart';
 
-import '../state/octopus_state.dart';
-
 /// Error handling for Octopus router.
 typedef OctopusErrorCallback = void Function(
   OctopusException exception,
@@ -60,29 +58,6 @@ class OctopusEncodeException extends OctopusException {
   @override
   String get message => 'Location${location != null ? ' "$location"' : ''} '
       'encoding exception: $exception';
-
-  @override
-  String toString() => message;
-}
-
-/// {@template error_decode_exception}
-/// Route information state decoding exception.
-/// {@endtemplate}
-class OctopusDecodeException extends OctopusException {
-  /// {@macro error_decode_exception}
-  OctopusDecodeException({
-    required this.exception,
-    required this.state,
-  });
-
-  /// The exception.
-  final Object exception;
-
-  /// Invalid router state.
-  final OctopusState state;
-
-  @override
-  String get message => 'State encoding exception: $exception';
 
   @override
   String toString() => message;

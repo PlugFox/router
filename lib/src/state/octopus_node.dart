@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:meta/meta.dart';
 
 import '../route/octopus_route.dart';
@@ -9,25 +7,22 @@ import '../route/octopus_route.dart';
 @immutable
 abstract class OctopusNode<T extends OctopusRoute> {
   /// Page node.
-  const factory OctopusNode.page({
-    required T route,
+  const factory OctopusNode.page(
+    T route, {
     Map<String, String> arguments,
   }) = OctopusNode$Page;
 
-  /* const factory OctopusNode.tabs({
-    required T route,
+  /* const factory OctopusNode.tabs(T route, {
     required OctopusNode current,
     required List<OctopusNode> children,
     Map<String, String> arguments,
   }) = OctopusNode$Tabs; */
 
-  /* const factory OctopusNode.navigator({
-    required T route,
+  /* const factory OctopusNode.navigator(T route, {
     Map<String, String> arguments,
   }) = OctopusNode$Navigator; */
 
-  /* factory OctopusNode.switch({
-    required String name,
+  /* factory OctopusNode.switch(T route, {
     Map<String, String> arguments,
   }) = OctopusNode$Page; */
 
@@ -36,9 +31,6 @@ abstract class OctopusNode<T extends OctopusRoute> {
 
   /// Arguments of this node.
   abstract final Map<String, String> arguments;
-
-  /// Children of this node.
-  abstract final List<OctopusNode> children;
 
   /// Convert this node to JSON.
   Map<String, Object?> toJson();
@@ -59,8 +51,8 @@ abstract class OctopusNode<T extends OctopusRoute> {
 @immutable
 class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
   /// Page node.
-  const OctopusNode$Page({
-    required this.route,
+  const OctopusNode$Page(
+    this.route, {
     this.arguments = const <String, String>{},
   }); /* : assert(name.isNotEmpty, 'Name must not be empty'); */
 
@@ -69,9 +61,6 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
 
   @override
   final Map<String, String> arguments;
-
-  @override
-  List<OctopusNode> get children => UnmodifiableListView(<OctopusNode>[]);
 
   @override
   map<R>({
@@ -100,7 +89,7 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
   */
 
   @override
-  void visitChildNodes(NodeVisitor visitor) => children.forEach(visitor);
+  void visitChildNodes(NodeVisitor visitor) {}
 }
 
 /* @immutable

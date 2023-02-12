@@ -6,7 +6,8 @@ import 'package:octopus/octopus.dart';
 enum FakeRoutes implements OctopusRouteOwner {
   shop(ShopRoute()),
   category(CategoryRoute()),
-  product(ProductRoute());
+  product(ProductRoute()),
+  giftVouchers(GiftVouchersRoute());
 
   const FakeRoutes(this.route);
 
@@ -20,7 +21,7 @@ class ShopRoute extends OctopusRoute$Page {
   @override
   Page<void> buildPage(BuildContext context, Map<String, String> arguments) =>
       MaterialPage<void>(
-        key: ValueKey<String>(name),
+        key: ValueKey<String>(key),
         child: const Text('Shop'),
       );
 }
@@ -32,7 +33,7 @@ class CategoryRoute extends OctopusRoute$Page {
   Page<void> buildPage(BuildContext context, Map<String, String> arguments) {
     final id = arguments['id'];
     return MaterialPage<void>(
-      key: ValueKey<String>('$name@id=$id'),
+      key: ValueKey<String>('$key@id=$id'),
       child: const Text('Category'),
     );
   }
@@ -45,8 +46,20 @@ class ProductRoute extends OctopusRoute$Page {
   Page<void> buildPage(BuildContext context, Map<String, String> arguments) {
     final id = arguments['id'];
     return MaterialPage<void>(
-      key: ValueKey<String>('$name@id=$id'),
+      key: ValueKey<String>('$key@id=$id'),
       child: const Text('Product'),
+    );
+  }
+}
+
+class GiftVouchersRoute extends OctopusRoute$Page {
+  const GiftVouchersRoute() : super('Gift vouchers');
+
+  @override
+  Page<void> buildPage(BuildContext context, Map<String, String> arguments) {
+    return MaterialPage<void>(
+      key: ValueKey<String>(key),
+      child: const Text('Gift vouchers'),
     );
   }
 }
