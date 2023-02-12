@@ -16,36 +16,25 @@ abstract class OctopusState {
 
   /// {@macro octopus_state}
   factory OctopusState({
-    required OctopusNode<OctopusRoute> current,
     required Iterable<OctopusNode<OctopusRoute>> children,
   }) =>
       OctopusStateImpl(
-        current: current,
         children: children,
       );
 
   /// {@macro octopus_state}
   factory OctopusState.single(OctopusNode<OctopusRoute> node) => OctopusState(
-        current: node,
         children: <OctopusNode<OctopusRoute>>[node],
       );
 
-  /// Current active/visible node
-  abstract final OctopusNode<OctopusRoute> current;
-
   /// Children of this state
   abstract final List<OctopusNode<OctopusRoute>> children;
-
-  /// Active routing path of the application
-  /// e.g. /shop/category@id=1/category@id=24/brand&name=Apple/product@id=123&color=green
-  List<OctopusNode<OctopusRoute>> get location;
 
   /// Try to pop the current node and return new, previus state
   OctopusState? maybePop();
 
   /// Copy this state with new values
   OctopusState copyWith({
-    OctopusNode<OctopusRoute>? newCurrent,
     List<OctopusNode<OctopusRoute>>? newChildren,
   });
 
@@ -94,19 +83,11 @@ abstract class OctopusState {
 class OctopusStateImpl extends OctopusState {
   /// {@nodoc}
   OctopusStateImpl({
-    // TODO(plugfox): Replace with factory and children based on current
-    required this.current,
     required Iterable<OctopusNode<OctopusRoute>> children,
   })  : children = children is UnmodifiableListView<OctopusNode<OctopusRoute>>
             ? children
             : UnmodifiableListView<OctopusNode<OctopusRoute>>(children),
         super._();
-
-  @override
-  final OctopusNode<OctopusRoute> current;
-
-  @override
-  List<OctopusNode<OctopusRoute>> get location => children;
 
   @override
   final List<OctopusNode<OctopusRoute>> children;
@@ -116,24 +97,20 @@ class OctopusStateImpl extends OctopusState {
   OctopusState? maybePop() => children.length == 1
       ? null
       : copyWith(
-          newCurrent: children[children.length - 2],
           newChildren: children.sublist(0, children.length - 1),
         );
 
   // TODO(plugfox): implement OctopusState.copyWith()
   @override
   OctopusState copyWith({
-    OctopusNode<OctopusRoute>? newCurrent,
     List<OctopusNode<OctopusRoute>>? newChildren,
   }) =>
       OctopusStateImpl(
-        current: newCurrent ?? current,
         children: newChildren ?? children,
       );
 
   @override
   Map<String, Object?> toJson() => <String, Object?>{
-        'current': current.toJson(),
         'children':
             children.map<Map<String, Object?>>((e) => e.toJson()).toList(),
       };
@@ -148,38 +125,27 @@ class OctopusStateImpl extends OctopusState {
   @override
   String toStringDeep() {
     final buffer = StringBuffer();
-    buffer.writeln('Root');
-    var depth = 0;
-    void addNode(OctopusNode<OctopusRoute> node, int depth) {
-      buffer
-        ..write('  ' * depth)
-        ..write('├── ')
-        ..write(node.route.name);
-      if (node.arguments.isNotEmpty) {
-        buffer
-          ..write('(')
-          ..write(node.arguments.entries
-              .map<String>((e) => '${e.key}: ${e.value}')
-              .join(', '))
-          ..write(')');
-      }
-      buffer.writeln();
+    buffer.writeln(' Root');
+
+    void writeNode(OctopusNode<OctopusRoute> node, int depth) => buffer
+      ..write('  ' * depth)
+      ..write('├─')
+      ..writeln(node.toString());
+
+    void visitor(OctopusNode<OctopusRoute> node, int depth) {
+      writeNode(node, depth);
+      node.visitChildNodes((node) => visitor(node, depth + 1));
     }
 
-    visitChildNodes((node) {
-      depth = 0;
-      addNode(node, depth);
-    });
-
+    visitChildNodes((node) => visitor(node, 0));
     return buffer.toString();
   }
 
   @override
-  String toStringShallow() => '/${location.map((e) => e.route.key).join('/')}';
+  String toStringShallow() => '/${children.map((e) => e.route.key).join('/')}';
 
   @override
-  String toStringShort() =>
-      'OctopusState(current: $current, children: ${children.length})';
+  String toStringShort() => 'OctopusState(children: ${children.length})';
 
   @override
   String toString() => toStringShallow();
@@ -205,16 +171,9 @@ class InvalidOctopusState extends OctopusState {
 
   @override
   OctopusState copyWith({
-    OctopusNode<OctopusRoute>? newCurrent,
     List<OctopusNode<OctopusRoute>>? newChildren,
   }) =>
       InvalidOctopusState(error, stackTrace);
-
-  @override
-  OctopusNode<OctopusRoute> get current => throw UnimplementedError();
-
-  @override
-  List<OctopusNode<OctopusRoute>> get location => throw UnimplementedError();
 
   @override
   OctopusState? maybePop() => throw UnimplementedError();

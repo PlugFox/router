@@ -33,7 +33,6 @@ class OctopusStateEncoder extends Converter<RouteInformation, OctopusState> {
     final nodes = nodesFromUri(uri?.pathSegments);
     assert(nodes.isNotEmpty, 'Empty nodes');
     return OctopusState(
-      current: nodes.last,
       children: nodes,
     );
   }

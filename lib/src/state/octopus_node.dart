@@ -93,6 +93,12 @@ class OctopusNode$Page<T extends OctopusRoute> implements OctopusNode<T> {
 
   @override
   void visitChildNodes(NodeVisitor visitor) {}
+
+  @override
+  String toString() => '${route.name}'
+      '{'
+      '${arguments.entries.map((e) => '${e.key}: ${e.value}').join(', ')}'
+      '}';
 }
 
 /* @immutable
